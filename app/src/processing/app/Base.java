@@ -146,6 +146,8 @@ public class Base {
 
 
   static private void createAndShowGUI(String[] args) {
+    long overAll = System.currentTimeMillis();
+    long startTime = System.currentTimeMillis();
     try {
       File versionFile = getContentFile("lib/version.txt"); //$NON-NLS-1$
       if (versionFile.exists()) {
@@ -158,9 +160,11 @@ public class Base {
     } catch (Exception e) {
       e.printStackTrace();
     }
-
+    System.out.println("PApplet.loadStrings time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     initPlatform();
-
+    System.out.println("initPlatform time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // Use native popups so they don't look so crappy on OS X
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
@@ -172,13 +176,16 @@ public class Base {
 
     // Load the languages
     Language.init();
-
+    System.out.println("Language.init time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // run static initialization that grabs all the prefs
     Preferences.init();
-
+    System.out.println("Preferences.init time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // Get the sketchbook path, and make sure it's set properly
     locateSketchbookFolder();
-
+    System.out.println("locateSketchbookFolder time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
 //    String filename = args.length > 1 ? args[0] : null;
     if (!SingleInstance.alreadyRunning(args)) {
 //      SingleInstance.startServer(platform);
@@ -192,7 +199,8 @@ public class Base {
         loge("Could not set the Look & Feel", e); //$NON-NLS-1$
 //        }
       }
-
+      System.out.println("platform.setLookAndFeel time: " + (System.currentTimeMillis() - startTime));
+      startTime = System.currentTimeMillis();
       // Create a location for untitled sketches
       try {
         untitledFolder = Base.createTempFolder("untitled", "sketches", null);
@@ -202,7 +210,9 @@ public class Base {
                        "Could not create a place to store untitled sketches.\n" +
                        "That's gonna prevent us from continuing.", e);
       }
-
+      
+      System.out.println("untitled sketches time: " + (System.currentTimeMillis() - startTime));
+      startTime = System.currentTimeMillis();
       log("about to create base..."); //$NON-NLS-1$
       try {
         Base base = new Base(args);
@@ -215,8 +225,11 @@ public class Base {
         showBadnessTrace("We're off on the wrong foot",
                          "An error occurred during startup.", t, true);
       }
+      System.out.println("create base time: " + (System.currentTimeMillis() - startTime));
+      startTime = System.currentTimeMillis();
       log("done creating base..."); //$NON-NLS-1$
     }
+    System.out.println("Overall time: " + (System.currentTimeMillis() - overAll));
   }
 
 
@@ -352,6 +365,7 @@ public class Base {
 //      if (ContributionManager.isDeletionFlagSet(contrib)) {
 //        removeDir(contrib.getFolder());
 //      }
+    long startTime = System.currentTimeMillis();
 //    }
     ContributionManager.cleanup(this);
     buildCoreModes();
@@ -360,9 +374,13 @@ public class Base {
     rebuildContribExamples();
 
     // Needs to happen after the sketchbook folder has been located.
+    System.out.println("Contribs time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // Also relies on the modes to be loaded so it knows what can be
     // marked as an example.
     recent = new Recent(this);
+    System.out.println("recent time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
 
     String lastModeIdentifier = Preferences.get("mode.last"); //$NON-NLS-1$
     if (lastModeIdentifier == null) {
@@ -380,6 +398,8 @@ public class Base {
         logf("Could not find mode %s, using default.", lastModeIdentifier); //$NON-NLS-1$
       }
     }
+    System.out.println("lastModeIdentifier time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
 
     libraryManagerFrame =
       new ContributionManagerDialog(ContributionType.LIBRARY);
@@ -392,13 +412,21 @@ public class Base {
     updateManagerFrame =
       new ContributionManagerDialog(null);
 
+    System.out.println("contribs init time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
+    
     // Make sure ThinkDifferent has library examples too
     nextMode.rebuildLibraryList();
 
+    System.out.println("nextMode.rebuildLibraryList time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
+    
     // Put this after loading the examples, so that building the default file
     // menu works on Mac OS X (since it needs examplesFolder to be set).
     platform.init(this);
 
+    System.out.println("platform.init time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
 //    toolsFolder = getContentFile("tools");
 
 //    // Check if there were previously opened sketches to be restored
@@ -424,7 +452,8 @@ public class Base {
         opened = true;
       }
     }
-
+    System.out.println("windows bugfix time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // Create a new empty window (will be replaced with any files to be opened)
     if (!opened) {
 //      System.out.println("opening a new window");
@@ -432,11 +461,14 @@ public class Base {
 //    } else {
 //      System.out.println("something else was opened");
     }
-
+    System.out.println("handlenew() time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
     // check for updates
     if (Preferences.getBoolean("update.check")) { //$NON-NLS-1$
       new UpdateCheck(this);
     }
+    System.out.println("updatecheck time: " + (System.currentTimeMillis() - startTime));
+    startTime = System.currentTimeMillis();
   }
 
 
