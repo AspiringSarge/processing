@@ -1,6 +1,7 @@
 Processing
 ==========
-
+[![Build Status](https://travis-ci.org/joelmoniz/processing.svg?branch=testing-travisCI)](https://travis-ci.org/joelmoniz/processing)
+  
 This is the official source code for the [Processing](http://processing.org) Development Environment (PDE), 
 the “core” and the libraries that are included with the [download](http://processing.org/download). 
 
