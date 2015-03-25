@@ -367,11 +367,28 @@ public class Base {
 //      }
     long startTime = System.currentTimeMillis();
 //    }
-    ContributionManager.cleanup(this);
     buildCoreModes();
     rebuildContribModes();
 
-    rebuildContribExamples();
+    new Thread(new Runnable() {
+
+      @Override
+      public void run() {
+
+        try {
+          ContributionManager.cleanup(Base.this);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+
+        rebuildContribExamples();  
+
+        nextMode.rebuildLibraryList();
+      }
+      
+    });
+    
+    
 
     // Needs to happen after the sketchbook folder has been located.
     System.out.println("Contribs time: " + (System.currentTimeMillis() - startTime));
@@ -416,7 +433,7 @@ public class Base {
     startTime = System.currentTimeMillis();
     
     // Make sure ThinkDifferent has library examples too
-    nextMode.rebuildLibraryList();
+//    nextMode.rebuildLibraryList();
 
     System.out.println("nextMode.rebuildLibraryList time: " + (System.currentTimeMillis() - startTime));
     startTime = System.currentTimeMillis();
