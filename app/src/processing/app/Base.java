@@ -28,7 +28,6 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,7 +62,7 @@ public class Base {
 //  static private boolean RELEASE = false;
 
   /** True if heavy debugging error/log messages are enabled */
-  static public boolean DEBUG = false;
+  static public boolean DEBUG = true;
 //  static public boolean DEBUG = true;
 
   static HashMap<Integer, String> platformNames =
@@ -322,6 +321,19 @@ public class Base {
     if (modeContribs == null) {
       modeContribs = new ArrayList<ModeContribution>();
     }
+    Thread t = new Thread(new Runnable() {
+      
+      @Override
+      public void run() {
+        try {
+          Thread.sleep(9000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        System.out.println("Rebuiding contributed modes");
+      }
+    });
+    t.start();
     ModeContribution.loadMissing(this);
 
 //    ArrayList<ModeContribution> newContribs =

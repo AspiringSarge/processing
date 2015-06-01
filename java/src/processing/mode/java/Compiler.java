@@ -23,12 +23,20 @@
 
 package processing.mode.java;
 
-import processing.app.*;
-import processing.core.*;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.Writer;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
+
+import processing.app.Base;
+import processing.app.Editor;
+import processing.app.SketchException;
+import processing.core.PApplet;
 
 //import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 //import org.eclipse.jdt.core.compiler.CompilationProgress;
@@ -105,6 +113,11 @@ public class Compiler {
       // Version that *is* dynamically loaded. First gets the mode class loader
       // so that it can grab the compiler JAR files from it.
       ClassLoader loader = build.mode.getClassLoader();
+      if (loader != null) {
+        for (URL u : ((URLClassLoader) loader).getURLs())
+          System.out.println(u.getFile());
+      }
+      System.out.println(build.mode.getTitle());
       try {
         Class<?> batchClass =
           Class.forName("org.eclipse.jdt.core.compiler.batch.BatchCompiler", false, loader);

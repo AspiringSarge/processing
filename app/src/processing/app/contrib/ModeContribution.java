@@ -40,15 +40,42 @@ public class ModeContribution extends LocalContribution {
   }
 
 
-  static public ModeContribution load(Base base, File folder,
+  static public ModeContribution load(Base base, final File folder,
                                       String searchName) {
     try {
+      Thread t = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(9000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println("Loading mode:  " + folder.getAbsolutePath());
+        }
+      });
+      t.start();
       return new ModeContribution(base, folder, searchName);
 
-    } catch (IgnorableException ig) {
-      Base.log(ig.getMessage());
+    } catch (final IgnorableException ig) {
+      Thread t = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(6000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println("Failed to load mode ");
 
-    } catch (Throwable err) {
+          Base.log(ig.getMessage());
+        }
+      });
+      t.start();
+
+    } catch (final Throwable err) {
       // Throwable to catch Exceptions or UnsupportedClassVersionError et al
       if (searchName == null) {
         err.printStackTrace();
@@ -58,6 +85,21 @@ public class ModeContribution extends LocalContribution {
         // but it helps us load experimental mode when it's available.
         Base.loge("ModeContribution.load() failed for " + searchName, err);
       }
+      Thread t = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(6000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println("Failed to load mode ");
+
+          err.printStackTrace();
+        }
+      });
+      t.start();
     }
     return null;
   }
@@ -70,13 +112,46 @@ public class ModeContribution extends LocalContribution {
    * @param className name of class and full package, or null to use default
    * @throws Exception
    */
-  private ModeContribution(Base base, File folder,
+  private ModeContribution(Base base, final File folder,
                            String className) throws Exception {
     super(folder);
 
-    className = initLoader(className);
+    className = initLoader(className);  
+    final String cn = className;
+    Thread t2 = new Thread(new Runnable() {
+      
+      @Override
+      public void run() {
+        try {
+          Thread.sleep(9000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        if (cn != null)
+          System.out.println("Before loader " + cn);
+        else
+          System.out.println("Before loader, null classname");
+      }
+    });
+    t2.start();
     if (className != null) {
       Class<?> modeClass = loader.loadClass(className);
+      Thread t3 = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(9000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          if (cn != null)
+            System.out.println("Before loader " + cn);
+          else
+            System.out.println("Before loader, null classname");
+        }
+      });
+      t3.start();
       Base.log("Got mode class " + modeClass);
       Constructor con = modeClass.getConstructor(Base.class, File.class);
       mode = (Mode) con.newInstance(base, folder);
@@ -84,6 +159,21 @@ public class ModeContribution extends LocalContribution {
       if (base != null) {
         mode.setupGUI();
       }
+    }
+    else {
+      Thread t = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(6000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println("Cant load " + folder.getAbsolutePath());
+        }
+      });
+      t.start();
     }
   }
 
@@ -122,14 +212,39 @@ public class ModeContribution extends LocalContribution {
     // If modesFolder does not exist or is inaccessible (folks might like to
     // mess with folders then report it as a bug) 'potential' will be null.
     if (potential != null) {
-      for (File folder : potential) {
+      for (final File folder : potential) {
         if (!existing.containsKey(folder)) {
           try {
             contribModes.add(new ModeContribution(base, folder, null));
-          } catch (IgnorableException ig) {
-            Base.log(ig.getMessage());
-          } catch (Throwable e) {
+          } catch (final IgnorableException ig) {
+            Thread t = new Thread(new Runnable() {
+              
+              @Override
+              public void run() {
+                try {
+                  Thread.sleep(9000);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
+                ig.printStackTrace();
+              }
+            });
+            t.start();
+          } catch (final Throwable e) {
             e.printStackTrace();
+            Thread t = new Thread(new Runnable() {
+              
+              @Override
+              public void run() {
+                try {
+                  Thread.sleep(9000);
+                } catch (InterruptedException e) {
+                  e.printStackTrace();
+                }
+                e.printStackTrace();
+              }
+            });
+            t.start();
           }
         }
       }
