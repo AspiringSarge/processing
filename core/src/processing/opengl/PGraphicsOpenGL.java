@@ -162,7 +162,7 @@ public class PGraphicsOpenGL extends PGraphics {
   static protected URL defLightShaderVertURL =
     PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/LightVert.glsl");
   static protected URL defTexlightShaderVertURL =
-    PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/TexlightVert.glsl");
+    PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/TexLightVert.glsl");
   static protected URL defColorShaderFragURL =
     PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/ColorFrag.glsl");
   static protected URL defTextureShaderFragURL =
@@ -170,7 +170,7 @@ public class PGraphicsOpenGL extends PGraphics {
   static protected URL defLightShaderFragURL =
     PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/LightFrag.glsl");
   static protected URL defTexlightShaderFragURL =
-    PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/TexlightFrag.glsl");
+    PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/TexLightFrag.glsl");
 
   static protected URL defLineShaderVertURL =
     PGraphicsOpenGL.class.getResource("/processing/opengl/shaders/LineVert.glsl");
@@ -590,6 +590,9 @@ public class PGraphicsOpenGL extends PGraphics {
   public void setSize(int iwidth, int iheight) {
     width = iwidth;
     height = iheight;
+    float f = getPixelScale();
+    pixelWidth = (int)(width * f);
+    pixelHeight = (int)(height * f);
 
     // init perspective projection based on new dimensions
     cameraFOV = 60 * DEG_TO_RAD; // at least for now
@@ -700,7 +703,8 @@ public class PGraphicsOpenGL extends PGraphics {
 
 
   public float getPixelScale() {
-    return surfaceJOGL.getPixelScale();
+    if (surfaceJOGL == null) return pixelFactor;
+    else return surfaceJOGL.getPixelScale();
   }
 
 
@@ -3509,10 +3513,12 @@ public class PGraphicsOpenGL extends PGraphics {
       lastSmoothCall = parent.frameCount;
 
       quality = level;
-      System.out.println(quality);
 
-      if (quality == 1) {
+      if (quality <= 1) {
         quality = 0;
+        textureSampling = Texture.POINT;
+      } else {
+        textureSampling = Texture.TRILINEAR;
       }
 
       // This will trigger a surface restart next time
@@ -3527,6 +3533,7 @@ public class PGraphicsOpenGL extends PGraphics {
     if (smoothDisabled) return;
 
     smooth = false;
+    textureSampling = Texture.POINT;
 
     if (1 < quality) {
       smoothCallCount++;
@@ -5729,20 +5736,21 @@ public class PGraphicsOpenGL extends PGraphics {
                          int sourceX, int sourceY,
                          int sourceWidth, int sourceHeight,
                          int targetX, int targetY) {
+    // Copies the pixels
     loadPixels();
-    super.setImpl(sourceImage, sourceX, sourceY, sourceWidth, sourceHeight,
-                  targetX, targetY);
- // do we need this?
- // see https://github.com/processing/processing/issues/2125
-//     if (sourceImage.format == RGB) {
-//       int targetOffset = targetY * width + targetX;
-//       for (int y = sourceY; y < sourceY + sourceHeight; y++) {
-//         for (int x = targetOffset; x < targetOffset + sourceWidth; x++) {
-//           pixels[x] |= 0xff000000;
-//         }
-//         targetOffset += width;
-//       }
-//     }
+    int sourceOffset = sourceY * sourceImage.pixelWidth + sourceX;
+    int targetOffset = targetY * pixelWidth + targetX;
+    for (int y = sourceY; y < sourceY + sourceHeight; y++) {
+      System.arraycopy(sourceImage.pixels, sourceOffset, pixels, targetOffset, sourceWidth);
+      sourceOffset += sourceImage.pixelWidth;
+      targetOffset += pixelWidth;
+    }
+
+    // Draws the texture, copy() is very efficient because it simply renders
+    // the texture cache of sourceImage using OpenGL.
+    copy(sourceImage,
+         sourceX, sourceY, sourceWidth, sourceHeight,
+         targetX, targetY, sourceWidth, sourceHeight);
   }
 
 
@@ -5889,7 +5897,8 @@ public class PGraphicsOpenGL extends PGraphics {
     // Processing Y axis is inverted with respect to OpenGL, so we need to
     // invert the y coordinates of the screen rectangle.
     pgl.disable(PGL.BLEND);
-    pgl.drawTexture(texture.glTarget, texture.glName, texture.glWidth, texture.glHeight,
+    pgl.drawTexture(texture.glTarget, texture.glName,
+                    texture.glWidth, texture.glHeight,
                     0, 0, width, height,
                     x, y, x + w, y + h,
                     x, height - (y + h), x + w, height - y);
@@ -6386,7 +6395,8 @@ public class PGraphicsOpenGL extends PGraphics {
 
   protected void checkTexture(Texture tex) {
     if (!tex.colorBuffer() &&
-        tex.usingMipmaps == hints[DISABLE_TEXTURE_MIPMAPS]) {
+        (tex.usingMipmaps == hints[DISABLE_TEXTURE_MIPMAPS] ||
+         tex.currentSampling() != textureSampling)) {
       if (hints[DISABLE_TEXTURE_MIPMAPS]) {
         tex.usingMipmaps(false, textureSampling);
       } else {
@@ -7120,6 +7130,15 @@ public class PGraphicsOpenGL extends PGraphics {
       lastModified = PConstants.MIN_INT;
 
       active = true;
+    }
+
+    public boolean diff(VertexAttribute attr) {
+       return !name.equals(attr.name) ||
+              kind != attr.kind ||
+              type != attr.type ||
+              size != attr.size ||
+              tessSize != attr.tessSize ||
+              elementSize != attr.elementSize;
     }
 
     boolean isPosition() {

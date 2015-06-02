@@ -1,7 +1,58 @@
 0237 (3.0a10)
+X retain original java.awt.Frame when it's in use
+
+fixed earlier/can no longer reproduce
+X strips when rendering spheres with lights and anti-aliasing
+X   https://github.com/processing/processing/issues/1185
+
+andres/opengl
+X set(0, 0, image) does not set alpha channel to opaque in P2D/P3D
+X   https://github.com/processing/processing/issues/2125
+X group shapes are broken in 3.0a9
+X   https://github.com/processing/processing/issues/3336
+X only a quarter of the sketch is appearing with P2D_2X and P3D_2X
+X   (i.e. the image shows up too large) 
+X   https://github.com/processing/processing/issues/3332
+X   https://github.com/processing/processing/issues/3327
+X single transparent pixel at end of textures in OpenGL
+X   https://github.com/processing/processing/issues/115
+X implement setImpl() instead of set() inside PGraphicsOpenGL
+X   https://github.com/processing/processing/issues/160
+_ save() and saveFrame() with OPENGL renderer fails
+_   https://github.com/processing/processing/issues/3334
+
+beta
+_ fullScreen() method
+_ sort out display stuff
+_ Text looks blurry in GL Retina (andres)
+_   https://github.com/processing/processing/issues/2739
+_ check retina with PGraphicsRetina2D
+_ Text is half size in PGraphicsRetina2D
+_   https://github.com/processing/processing/issues/2738
+_ text not getting the correct font in Retina2D
+_   https://github.com/processing/processing/issues/2617
+
+
+critical
+_ draw() executes twice when noLoop() called in setup()
+_   https://github.com/processing/processing/issues/3310
+_   broken since 3.0a7, but not in 3.0a5
+_ static mode broken with Java2D on Windows and Linux
+_   https://github.com/processing/processing/issues/3315
+_ sketch sometimes doesn't show with noLoop() on Linux
+_   https://github.com/processing/processing/issues/3316
 
 
 high priority
+_ prevent running _2X renderers on non-2x hardware
+_ PGraphic ignores PNG transparency (regression from 3.0a5)
+_   https://github.com/processing/processing/issues/3317
+_ strokeWeight() in setup() not working for default renderer
+_   https://github.com/processing/processing/issues/3331
+_ sketch window briefly appears on top left corner when using OpenGL
+_   https://github.com/processing/processing/issues/3308
+_ looks like we're off by 1 on monitor numbering 
+_   https://github.com/processing/processing/issues/3309
 _ need a better option for using full screen
 _   https://github.com/processing/processing/issues/3296
 _   right now using a (display ignoring) hack to displayWidth/Height
@@ -58,6 +109,7 @@ _ public createShape() method that takes another shape as param?
 _   should just be the constructor doing this, or copy()
 _ add attrib() method
 _   https://github.com/processing/processing/issues/2963
+_   andres needs input on how the api works
 _   assign this to DXF as well?
 
 
@@ -69,9 +121,13 @@ _   also not API we want to expose, so sort this out
 _   or maybe we're fine b/c now FX2D needs it as well
 _ when did setPath() sneak into PShape? API is nothing like anything else
 _   probably from the material stuff, but we need to fix that
+_ ortho function is broken
+_   https://github.com/processing/processing/issues/1278
 
 
 full screen
+_ claim about a bar at the top in 10.9
+_   https://github.com/processing/processing/issues/3305
 _ present window draws in stages (OS X)
 _ split 'present' and 'full screen'?
 _   --full-screen causes considerable flicker at this point
@@ -170,13 +226,6 @@ _   just do pixelFactor() (and pull it during compilation)?
 _   add sketchPixelFactor() to handle the scenario?
 _   or is it just a boolean, because pixelFactor(2) is the only option?
 _ remove retina hint
-_ Text looks blurry in GL Retina (andres)
-_   https://github.com/processing/processing/issues/2739
-_ check retina with PGraphicsRetina2D
-_ Text is half size in PGraphicsRetina2D
-_   https://github.com/processing/processing/issues/2738
-_ text not getting the correct font in Retina2D
-_   https://github.com/processing/processing/issues/2617
 _ saveFrame() with retina render is making black images
 _ no high-res display support for OpenGL
 _   https://github.com/processing/processing/issues/2573
