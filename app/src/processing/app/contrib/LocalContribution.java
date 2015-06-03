@@ -123,7 +123,7 @@ public abstract class LocalContribution extends Contribution {
   public String initLoader(String className) throws Exception {
     File modeDirectory = new File(folder, getTypeName());
     if (modeDirectory.exists()) {
-      Base.log("checking mode folder regarding " + className);
+//      Base.logdelayed("checking mode folder regarding " + className);
       // If no class name specified, search the main <modename>.jar for the
       // full name package and mode name.
       if (className == null) {
@@ -132,6 +132,7 @@ public abstract class LocalContribution extends Contribution {
         if (mainJar.exists()) {
           className = findClassInZipFile(shortName, mainJar);
         } else {
+          Base.logdelayed("No main jar found for class " + modeDirectory.getName());
           throw new IgnorableException(mainJar.getAbsolutePath() + " does not exist.");
         }
 
@@ -139,19 +140,33 @@ public abstract class LocalContribution extends Contribution {
           throw new IgnorableException("Could not find " + shortName +
                                        " class inside " + mainJar.getAbsolutePath());
         }
+        else {
+          Base.logdelayed("Found " + shortName +
+                          " class inside " + mainJar.getAbsolutePath());
+        }
       }
 
       // Add .jar and .zip files from the "mode" folder into the classpath
       File[] archives = Base.listJarFiles(modeDirectory);
       if (archives != null && archives.length > 0) {
         URL[] urlList = new URL[archives.length];
+//        File javamode = new File("C:\\Users\\Joel\\Documents\\Code\\p5\\processing\\build\\windows\\work\\modes\\java\\mode\\JavaMode.jar");
         for (int j = 0; j < urlList.length; j++) {
-          Base.log("Found archive " + archives[j] + " for " + getName());
+          Base.logdelayed("Found archive " + archives[j] + " for " + getName());
           urlList[j] = archives[j].toURI().toURL();
         }
+//        Base.logdelayed("Found archive " + javamode + " for " + getName());
+//        urlList[urlList.length-1] = javamode.toURI().toURL();
 //        loader = new URLClassLoader(urlList, Thread.currentThread().getContextClassLoader());
         loader = new URLClassLoader(urlList);
-        Base.log("loading above JARs with loader " + loader);
+        Base.logdelayed("loading above JARs with loader " + loader);
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+        
+        URL[] urls = ((URLClassLoader)cl).getURLs();
+ 
+        for(URL url: urls){
+          Base.logdelayed("In current classpath: " + url.getFile());
+        }
 //        System.out.println("listing classes for loader " + loader);
 //        listClasses(loader);
       }

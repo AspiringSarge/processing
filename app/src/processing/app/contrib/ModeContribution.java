@@ -118,41 +118,17 @@ public class ModeContribution extends LocalContribution {
 
     className = initLoader(className);  
     final String cn = className;
-    Thread t2 = new Thread(new Runnable() {
-      
-      @Override
-      public void run() {
-        try {
-          Thread.sleep(9000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        if (cn != null)
-          System.out.println("Before loader " + cn);
-        else
-          System.out.println("Before loader, null classname");
-      }
-    });
-    t2.start();
+    
+    if (cn != null)
+      Base.logdelayed("Before loader " + cn);
+    else
+      Base.logdelayed("Before loader, null classname");
+    
     if (className != null) {
+      Base.logdelayed("Getting mode class " + cn);
       Class<?> modeClass = loader.loadClass(className);
-      Thread t3 = new Thread(new Runnable() {
-        
-        @Override
-        public void run() {
-          try {
-            Thread.sleep(9000);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-          if (cn != null)
-            System.out.println("Before loader " + cn);
-          else
-            System.out.println("Before loader, null classname");
-        }
-      });
-      t3.start();
-      Base.log("Got mode class " + modeClass);
+
+      Base.logdelayed("Got mode class " + modeClass);
       Constructor con = modeClass.getConstructor(Base.class, File.class);
       mode = (Mode) con.newInstance(base, folder);
       mode.setClassLoader(loader);
@@ -161,19 +137,7 @@ public class ModeContribution extends LocalContribution {
       }
     }
     else {
-      Thread t = new Thread(new Runnable() {
-        
-        @Override
-        public void run() {
-          try {
-            Thread.sleep(6000);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-          System.out.println("Cant load " + folder.getAbsolutePath());
-        }
-      });
-      t.start();
+      Base.logdelayed("Cant load " + folder.getAbsolutePath());
     }
   }
 
@@ -226,6 +190,7 @@ public class ModeContribution extends LocalContribution {
                 } catch (InterruptedException e) {
                   e.printStackTrace();
                 }
+                System.out.println("Here- contribmodes add");
                 ig.printStackTrace();
               }
             });
@@ -241,6 +206,7 @@ public class ModeContribution extends LocalContribution {
                 } catch (InterruptedException e) {
                   e.printStackTrace();
                 }
+                System.out.println("Here- contribmodes add");
                 e.printStackTrace();
               }
             });

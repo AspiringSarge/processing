@@ -45,7 +45,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import processing.app.contrib.*;
 import processing.core.*;
 
-
 /**
  * The base class for the main processing application.
  * Primary role of this class is for platform identification and
@@ -2888,7 +2887,24 @@ public class Base {
       System.out.println(message);
     }
   }
-
+  
+  static public void logdelayed(final String message) {
+    if (DEBUG) {
+      Thread t3 = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(9000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println(message);
+        }
+      });
+      t3.start();
+    }
+  }
 
   static public void logf(String message, Object... args) {
     if (DEBUG) {
@@ -2903,7 +2919,24 @@ public class Base {
       e.printStackTrace();
     }
   }
-
+  
+  static public void logdelayede(final Throwable et) {
+    if (DEBUG) {
+      Thread t3 = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(9000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          et.printStackTrace();
+        }
+      });
+      t3.start();
+    }
+  }
 
   static public void loge(String message) {
     if (DEBUG) {
