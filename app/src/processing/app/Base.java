@@ -2914,4 +2914,22 @@ public class Base {
       System.out.println(message);
     }
   }
+  
+  static public void logdelayed(final String message) {
+    if (DEBUG) {
+      Thread t3 = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          try {
+            Thread.sleep(9000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+          System.out.println(message);
+        }
+      });
+      t3.start();
+    }
+  }
 }

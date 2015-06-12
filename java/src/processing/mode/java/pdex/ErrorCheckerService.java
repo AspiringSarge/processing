@@ -325,6 +325,7 @@ public class ErrorCheckerService implements Runnable {
    * and the counter is reset.
    */
   public void run() {
+    System.out.println("HERE!!! Mode: " + editor.getMode().getTitle());
     stopThread.set(false);
 
     checkCode();
@@ -360,12 +361,17 @@ public class ErrorCheckerService implements Runnable {
       updateSketchCodeListeners();
       if (pauseThread.get())
         continue;
-      if(textModified.get() == 0)
+      if(textModified.get() == 0) {
+//        System.out.println("Nope");
     	  continue;
+      }
+      else {
+        System.out.println("Yep");
+      }
       // Check if a certain interval has passed after the call. Only then
       // begin error check. Helps prevent unnecessary flickering. See #2677
       if (System.currentTimeMillis() - lastErrorCheckCall > errorCheckInterval) {
-        Base.log("Interval passed, starting error check");
+        System.out.println("Interval passed, starting error check");
         checkCode();
         checkForMissingImports();
       }
@@ -382,21 +388,32 @@ public class ErrorCheckerService implements Runnable {
 
 
   protected void updateSketchCodeListeners() {
+    int i = 0;
     for (final SketchCode sc : editor.getSketch().getCode()) {
+      i++;
       boolean flag = false;
       if (sc.getDocument() == null
-          || ((SyntaxDocument) sc.getDocument()).getDocumentListeners() == null)
+          || ((SyntaxDocument) sc.getDocument()).getDocumentListeners() == null) {
+        System.out.println(i + "  continue " + sc.getFileName());
         continue;
+      }
       for (DocumentListener dl : ((SyntaxDocument)sc.getDocument()).getDocumentListeners()) {
         if(dl.equals(sketchChangedListener)){
           flag = true;
+          System.out.println(i + "  scl found " + sc.getFileName());
           break;
         }
       }
       if(!flag){
-        // log("Adding doc listener to " + sc.getPrettyName());
+        //          System.out.println(sc.getDocument().getText(0, sc.getDocument().getLength()));
+//        System.out.println(editor.getSketch().getMainFilePath());
+        System.out.println(i + "  scl added " + sc.getFileName());
         sc.getDocument().addDocumentListener(sketchChangedListener);
       }
+//      else {
+//        System.out.println("uSCL Editor: " + flag +" "
+//        + editor.getSketch().getName());
+//      }
     }
   }
 
@@ -444,6 +461,7 @@ public class ErrorCheckerService implements Runnable {
    */
   public void runManualErrorCheck() {
     // log("Error Check.");
+    System.out.println("Manual.");
     textModified.incrementAndGet();
     lastErrorCheckCall = System.currentTimeMillis();
   }
@@ -464,6 +482,7 @@ public class ErrorCheckerService implements Runnable {
     @Override
     public void insertUpdate(DocumentEvent e) {
       if (JavaMode.errorCheckEnabled) {
+        System.out.println("inserted");
         runManualErrorCheck();
         //log("doc insert update, man error check..");
       }
@@ -472,6 +491,7 @@ public class ErrorCheckerService implements Runnable {
     @Override
     public void removeUpdate(DocumentEvent e) {
       if (JavaMode.errorCheckEnabled){
+        System.out.println("removed");
         runManualErrorCheck();
         //log("doc remove update, man error check..");
       }
@@ -480,6 +500,7 @@ public class ErrorCheckerService implements Runnable {
     @Override
     public void changedUpdate(DocumentEvent e) {
       if (JavaMode.errorCheckEnabled){
+        System.out.println("changed");
         runManualErrorCheck();
         //log("doc changed update, man error check..");
       }
@@ -1670,6 +1691,7 @@ public class ErrorCheckerService implements Runnable {
    */
   public void stopThread() {
     Base.loge("Stopping thread: " + editor.getSketch().getName());
+    Base.logdelayed("Stopped :(");
     stopThread.set(true);
   }
 
@@ -1678,6 +1700,7 @@ public class ErrorCheckerService implements Runnable {
    */
   public void pauseThread() {
     pauseThread.set(true);
+    Base.logdelayed("Stopped :(");
   }
 
   /**
