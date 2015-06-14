@@ -24,6 +24,7 @@
 package processing.app;
 
 import processing.app.contrib.ToolContribution;
+import processing.app.rsyntax.PDESyntaxTextArea;
 import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
@@ -53,6 +54,8 @@ import javax.swing.event.*;
 import javax.swing.plaf.basic.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 
 /**
@@ -92,7 +95,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
   protected EditorHeader header;
   protected EditorToolbar toolbar;
-  protected JEditTextArea textarea;
+  protected RSyntaxTextArea textarea;
+  protected PDESyntaxTextArea textareaComponent;
   protected EditorStatus status;
   protected JSplitPane splitPane;
   protected EditorFooter footer;
@@ -241,13 +245,15 @@ public abstract class Editor extends JFrame implements RunnerListener {
     header = createHeader();
     upper.add(header);
 
-    textarea = createTextArea();
-    textarea.setRightClickPopup(new TextAreaPopup());
-    textarea.setHorizontalOffset(JEditTextArea.leftHandGutter);
+    textareaComponent = createTextAreaComponent();
+    textarea = textareaComponent.getRSTextArea();
+    textarea.setPopupMenu(new TextAreaPopup());
+    // TODO:
+//    textarea.setHorizontalOffset(JEditTextArea.leftHandGutter);
 
     footer = createFooter();
 
-    upper.add(textarea);
+    upper.add(textareaComponent.getRTScrollPane());
 
     // alternate spot for status, but ugly
 //    status = new EditorStatus(this);
@@ -380,9 +386,10 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Broken out to get modes working for GSOC, but this needs a longer-term
    * solution where the listeners are handled properly.
    */
-  protected JEditTextArea createTextArea() {
-    return new JEditTextArea(new PdeTextAreaDefaults(mode),
-                             new PdeInputHandler());
+  protected PDESyntaxTextArea createTextAreaComponent() {
+    return new PDESyntaxTextArea();
+//    return new JEditTextArea(new PdeTextAreaDefaults(mode),
+//                             new PdeInputHandler());
     /*
     return new JEditTextArea(new PdeTextAreaDefaults(mode), new PdeInputHandler()) {
       // this is a kludge that needs to be removed [fry 150120]
@@ -660,7 +667,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    */
   protected void applyPreferences() {
     // Update fonts and other items controllable from the prefs
-    textarea.getPainter().updateAppearance();
+//    TODO: textarea.getPainter().updateAppearance();
     textarea.repaint();
 
     console.updateAppearance();
@@ -1471,7 +1478,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
     public boolean canCut() {
-      return textarea.isSelectionActive();
+      return textareaComponent.isSelectionActive();
     }
   }
 
@@ -1490,7 +1497,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
     public boolean canCopy() {
-      return textarea.isSelectionActive();
+      return textareaComponent.isSelectionActive();
     }
   }
 
@@ -1507,7 +1514,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
         final Integer caret = caretUndoStack.pop();
         caretRedoStack.push(caret);
         textarea.setCaretPosition(caret);
-        textarea.scrollToCaret();
+//        textarea.scrollToCaret();
       } catch (Exception ignore) {
       }
       try {
@@ -1647,8 +1654,13 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * found in this class. This will maintain compatibility with future releases,
    * which will not use JEditTextArea.
    */
-  public JEditTextArea getTextArea() {
+  public RSyntaxTextArea getTextArea() {
     return textarea;
+  }
+  
+
+  public PDESyntaxTextArea getTextAreaComponent() {
+    return textareaComponent;
   }
 
 
@@ -1664,7 +1676,12 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Get a range of text from the current buffer.
    */
   public String getText(int start, int stop) {
-    return textarea.getText(start, stop - start);
+    try {
+      return textarea.getText(start, stop - start);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
 
@@ -1682,7 +1699,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     startCompoundEdit();
     int caret = getCaretOffset();
     setSelection(caret, caret);
-    textarea.setSelectedText(what);
+    textareaComponent.setSelectedText(what);
     stopCompoundEdit();
   }
 
@@ -1697,8 +1714,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
 //    endCompoundEdit();
 //
 //    // make sure that a tool isn't asking for a bad location
-//    start = Math.max(0, Math.min(start, textarea.getDocumentLength()));
-//    stop = Math.max(0, Math.min(start, textarea.getDocumentLength()));
+//    start = Math.max(0, Math.min(start, textareaComponent.getDocumentLength()));
+//    stop = Math.max(0, Math.min(start, textareaComponent.getDocumentLength()));
 //    textarea.select(start, stop);
 //
 //    textarea.requestFocus();  // get the caret blinking
@@ -1711,14 +1728,14 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
 
   public void setSelectedText(String what) {
-    textarea.setSelectedText(what);
+    textareaComponent.setSelectedText(what);
   }
 
 
   public void setSelection(int start, int stop) {
     // make sure that a tool isn't asking for a bad location
-    start = PApplet.constrain(start, 0, textarea.getDocumentLength());
-    stop = PApplet.constrain(stop, 0, textarea.getDocumentLength());
+    start = PApplet.constrain(start, 0, textareaComponent.getDocumentLength());
+    stop = PApplet.constrain(stop, 0, textareaComponent.getDocumentLength());
 
     textarea.select(start, stop);
   }
@@ -1739,7 +1756,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * True if some text is currently selected.
    */
   public boolean isSelectionActive() {
-    return textarea.isSelectionActive();
+    return textareaComponent.isSelectionActive();
   }
 
 
@@ -1755,7 +1772,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Get the end point of the current selection.
    */
   public int getSelectionStop() {
-    return textarea.getSelectionStop();
+    return textarea.getSelectionEnd();
   }
 
 
@@ -1763,7 +1780,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Get text for a specified line.
    */
   public String getLineText(int line) {
-    return textarea.getLineText(line);
+    return textareaComponent.getLineText(line);
   }
 
 
@@ -1773,7 +1790,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
   public void setLineText(int line, String what) {
     startCompoundEdit();
     textarea.select(getLineStartOffset(line), getLineStopOffset(line));
-    textarea.setSelectedText(what);
+    textareaComponent.setSelectedText(what);
     stopCompoundEdit();
   }
 
@@ -1782,7 +1799,12 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Get character offset for the start of a given line of text.
    */
   public int getLineStartOffset(int line) {
-    return textarea.getLineStartOffset(line);
+    try {
+      return textarea.getLineStartOffset(line);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
 
@@ -1790,7 +1812,12 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Get character offset for end of a given line of text.
    */
   public int getLineStopOffset(int line) {
-    return textarea.getLineStopOffset(line);
+    try {
+      return textarea.getLineEndOffset(line);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+      return -1;
+    }
   }
 
 
@@ -1829,7 +1856,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
 
   public int getScrollPosition() {
-    return textarea.getVerticalScrollPosition();
+    return textareaComponent.getVerticalScrollPosition();
   }
 
 
@@ -1906,7 +1933,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
     // update the document object that's in use
-    textarea.setDocument(document,
+    textareaComponent.setDocument(document,
                          code.getSelectionStart(), code.getSelectionStop(),
                          code.getScrollPosition());
 
@@ -1966,7 +1993,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
 
   public void handleCopyAsHTML() {
-    textarea.copyAsHTML();
+    textareaComponent.copyAsHTML();
     statusNotice(Language.text("editor.status.copy_as_html"));
   }
 
@@ -2098,7 +2125,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
       } else {
         // replace with new bootiful text
         // selectionEnd hopefully at least in the neighborhood
-        int scrollPos = textarea.getVerticalScrollPosition();
+        int scrollPos = textareaComponent.getVerticalScrollPosition();
         setText(formattedText);
         setSelection(selectionEnd, selectionEnd);
 
@@ -2106,14 +2133,14 @@ public abstract class Editor extends JFrame implements RunnerListener {
         // Since we're not doing a good job of maintaining position anyway,
         // a more complicated workaround here is fairly pointless.
         // http://code.google.com/p/processing/issues/detail?id=1533
-        if (scrollPos != textarea.getVerticalScrollPosition()) {
+        if (scrollPos != textareaComponent.getVerticalScrollPosition()) {
 //          boolean wouldBeVisible =
 //            scrollPos >= textarea.getFirstLine() &&
 //            scrollPos < textarea.getLastLine();
 //
 //          // if it was visible, and now it's not, then allow the scroll
 //          if (!(wasVisible && !wouldBeVisible)) {
-          textarea.setVerticalScrollPosition(scrollPos);
+          textareaComponent.setVerticalScrollPosition(scrollPos);
 //          }
         }
         getSketch().setModified(true);
@@ -2137,16 +2164,21 @@ public abstract class Editor extends JFrame implements RunnerListener {
     String prefix = getCommentPrefix();
     int prefixLen = prefix.length();
 
-    int startLine = textarea.getSelectionStartLine();
-    int stopLine = textarea.getSelectionStopLine();
+    int startLine = textareaComponent.getSelectionStartLine();
+    int stopLine = textareaComponent.getSelectionStopLine();
 
-    int lastLineStart = textarea.getLineStartOffset(stopLine);
-    int selectionStop = textarea.getSelectionStop();
+    int lastLineStart = -1;
+    try {
+      lastLineStart = textarea.getLineStartOffset(stopLine);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
+    int selectionStop = textarea.getSelectionEnd();
     // If the selection ends at the beginning of the last line,
     // then don't (un)comment that line.
     if (selectionStop == lastLineStart) {
       // Though if there's no selection, don't do that
-      if (textarea.isSelectionActive()) {
+      if (textareaComponent.isSelectionActive()) {
         stopLine--;
       }
     }
@@ -2156,7 +2188,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     // when determining whether to comment or uncomment.
     boolean commented = true;
     for (int i = startLine; commented && (i <= stopLine); i++) {
-      String lineText = textarea.getLineText(i).trim();
+      String lineText = textareaComponent.getLineText(i).trim();
       if (lineText.length() == 0) {
         continue; //ignore blank lines
       }
@@ -2169,12 +2201,17 @@ public abstract class Editor extends JFrame implements RunnerListener {
     // all other lines while adding a comment. Required when commenting
     // lines which have uneven whitespaces in the beginning. Makes the
     // commented lines look more uniform.
-    int lso = Math.abs(textarea.getLineStartNonWhiteSpaceOffset(startLine)
-        - textarea.getLineStartOffset(startLine));
+    int lso = 0;
+    try {
+      lso = Math.abs(textareaComponent.getLineStartNonWhiteSpaceOffset(startLine)
+          - textarea.getLineStartOffset(startLine));
+    } catch (BadLocationException e1) {
+      e1.printStackTrace();
+    }
 
     for (int line = startLine; line <= stopLine; line++) {
-      int location = textarea.getLineStartNonWhiteSpaceOffset(line);
-      String lineText = textarea.getLineText(line);
+      int location = textareaComponent.getLineStartNonWhiteSpaceOffset(line);
+      String lineText = textareaComponent.getLineText(line);
       if (lineText.trim().length() == 0)
         continue; //ignore blank lines
       if (commented) {
@@ -2184,18 +2221,26 @@ public abstract class Editor extends JFrame implements RunnerListener {
         } else {
           textarea.select(location, location + prefixLen);
         }
-        textarea.setSelectedText("");
+        textareaComponent.setSelectedText("");
       } else {
         // add a comment
-        location = textarea.getLineStartOffset(line) + lso;
+        try {
+          location = textarea.getLineStartOffset(line) + lso;
+        } catch (BadLocationException e) {
+          e.printStackTrace();
+        }
         textarea.select(location, location);
-        textarea.setSelectedText(prefix);
+        textareaComponent.setSelectedText(prefix);
       }
     }
     // Subtract one from the end, otherwise selects past the current line.
     // (Which causes subsequent calls to keep expanding the selection)
-    textarea.select(textarea.getLineStartOffset(startLine),
-                    textarea.getLineStopOffset(stopLine) - 1);
+    try {
+      textarea.select(textarea.getLineStartOffset(startLine),
+                      textarea.getLineEndOffset(stopLine) - 1);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     stopCompoundEdit();
     sketch.setModified(true);
   }
@@ -2217,40 +2262,54 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
     startCompoundEdit();
 
-    int startLine = textarea.getSelectionStartLine();
-    int stopLine = textarea.getSelectionStopLine();
+    int startLine = textareaComponent.getSelectionStartLine();
+    int stopLine = textareaComponent.getSelectionStopLine();
 
     // If the selection ends at the beginning of the last line,
     // then don't (un)comment that line.
-    int lastLineStart = textarea.getLineStartOffset(stopLine);
-    int selectionStop = textarea.getSelectionStop();
+    int lastLineStart = -1;
+    try {
+      lastLineStart = textarea.getLineStartOffset(stopLine);
+    } catch (BadLocationException e1) {
+      e1.printStackTrace();
+    }
+    int selectionStop = textarea.getSelectionEnd();
     if (selectionStop == lastLineStart) {
       // Though if there's no selection, don't do that
-      if (textarea.isSelectionActive()) {
+      if (textareaComponent.isSelectionActive()) {
         stopLine--;
       }
     }
 
     for (int line = startLine; line <= stopLine; line++) {
-      int location = textarea.getLineStartOffset(line);
+      int location = -1;
+      try {
+        location = textarea.getLineStartOffset(line);
+      } catch (BadLocationException e) {
+        e.printStackTrace();
+      }
 
       if (indent) {
         textarea.select(location, location);
-        textarea.setSelectedText(tabString);
+        textareaComponent.setSelectedText(tabString);
 
       } else {  // outdent
-        int last = Math.min(location + tabSize, textarea.getDocumentLength());
+        int last = Math.min(location + tabSize, textareaComponent.getDocumentLength());
         textarea.select(location, last);
         // Don't eat code if it's not indented
         if (textarea.getSelectedText().equals(tabString)) {
-          textarea.setSelectedText("");
+          textareaComponent.setSelectedText("");
         }
       }
     }
     // Subtract one from the end, otherwise selects past the current line.
     // (Which causes subsequent calls to keep expanding the selection)
-    textarea.select(textarea.getLineStartOffset(startLine),
-                    textarea.getLineStopOffset(stopLine) - 1);
+    try {
+      textarea.select(textarea.getLineStartOffset(startLine),
+                      textarea.getLineEndOffset(stopLine) - 1);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     stopCompoundEdit();
     sketch.setModified(true);
   }
@@ -2305,7 +2364,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    */
   protected String referenceCheck(boolean selectIfFound) {
     int start = textarea.getSelectionStart();
-    int stop = textarea.getSelectionStop();
+    int stop = textarea.getSelectionEnd();
     if (stop < start) {
       int temp = stop;
       stop = start;
@@ -2753,9 +2812,9 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
     if (pageFormat != null) {
       //System.out.println("setting page format " + pageFormat);
-      printerJob.setPrintable(textarea.getPrintable(), pageFormat);
+      printerJob.setPrintable(textareaComponent.getPrintable(), pageFormat);
     } else {
-      printerJob.setPrintable(textarea.getPrintable());
+      printerJob.setPrintable(textareaComponent.getPrintable());
     }
     // set the name of the job to the code name
     printerJob.setJobName(sketch.getCurrentCode().getPrettyName());
@@ -2852,7 +2911,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
           // The error is at the end of this current chunk of code,
           // so the last line needs to be selected.
           line = textarea.getLineCount() - 1;
-          if (textarea.getLineText(line).length() == 0) {
+          if (textareaComponent.getLineText(line).length() == 0) {
             // The last line may be zero length, meaning nothing to select.
             // If so, back up one more line.
             line--;
@@ -2861,8 +2920,12 @@ public abstract class Editor extends JFrame implements RunnerListener {
         if (line < 0 || line >= textarea.getLineCount()) {
           System.err.println("Bad error line: " + line);
         } else {
-          textarea.select(textarea.getLineStartOffset(line),
-                          textarea.getLineStopOffset(line) - 1);
+          try {
+            textarea.select(textarea.getLineStartOffset(line),
+                            textarea.getLineEndOffset(line) - 1);
+          } catch (BadLocationException e1) {
+            e1.printStackTrace();
+          }
         }
       }
     }
@@ -3064,7 +3127,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
 //        discourseItem.setEnabled(false);
 ////        referenceItem.setEnabled(false);
 //      }
-      boolean active = textarea.isSelectionActive();
+      boolean active = textareaComponent.isSelectionActive();
       cutItem.setEnabled(active);
       copyItem.setEnabled(active);
       discourseItem.setEnabled(active);

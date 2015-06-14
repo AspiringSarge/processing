@@ -228,19 +228,20 @@ public class XQErrorTable extends JTable {
     classList.addListSelectionListener(new ListSelectionListener() {
       public void valueChanged(ListSelectionEvent e) {
         if (classList.getSelectedValue() != null) {
-          try {
+//          try {
             String t = classList.getSelectedValue().trim();
             Base.log(t);
             int x = t.indexOf('(');
             String impString = "import " + t.substring(x + 1, t.indexOf(')')) + ";\n";
             int ct = editor.getSketch().getCurrentCodeIndex();
             editor.getSketch().setCurrentCode(0);
-            editor.getTextArea().getDocument().insertString(0, impString, null);
+            // TODO:
+//            editor.getDocument().insertString(0, impString, null);
             editor.getSketch().setCurrentCode(ct);
-          } catch (BadLocationException ble) {
-            Base.log("Failed to insert import");
-            ble.printStackTrace();
-          }
+//          } catch (BadLocationException ble) {
+//            Base.log("Failed to insert import");
+//            ble.printStackTrace();
+//          }
         }
         frmImportSuggest.setVisible(false);
         frmImportSuggest.dispose();

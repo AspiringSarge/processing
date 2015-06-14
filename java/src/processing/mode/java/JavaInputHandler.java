@@ -27,11 +27,14 @@ package processing.mode.java;
 import processing.app.Editor;
 import processing.app.Preferences;
 import processing.app.Sketch;
+import processing.app.rsyntax.PDESyntaxTextArea;
 import processing.app.syntax.*;
 
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Arrays;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 
 /**
@@ -65,7 +68,8 @@ public class JavaInputHandler extends PdeInputHandler {
     int code = event.getKeyCode();
 
     Sketch sketch = editor.getSketch();
-    JEditTextArea textarea = editor.getTextArea();
+    PDESyntaxTextArea textareaComponent = editor.getTextAreaComponent();
+    RSyntaxTextArea textarea = editor.getTextArea();
 
     if ((event.getModifiers() & InputEvent.META_MASK) != 0) {
       //event.consume();  // does nothing
@@ -152,16 +156,16 @@ public class JavaInputHandler extends PdeInputHandler {
         // http://code.google.com/p/processing/issues/detail?id=458
         editor.handleOutdent();
 
-      } else if (textarea.isSelectionActive()) {
+      } else if (textareaComponent.isSelectionActive()) {
         editor.handleIndent();
 
       } else if (Preferences.getBoolean("editor.tabs.expand")) {
         int tabSize = Preferences.getInteger("editor.tabs.size");
-        textarea.setSelectedText(spaces(tabSize));
+        textareaComponent.setSelectedText(spaces(tabSize));
         event.consume();
 
       } else if (!Preferences.getBoolean("editor.tabs.expand")) {
-        textarea.setSelectedText("\t");
+        textareaComponent.setSelectedText("\t");
         event.consume();
       }
 
@@ -231,12 +235,12 @@ public class JavaInputHandler extends PdeInputHandler {
         if (spaceCount < 0) {
           // for rev 0122, actually delete extra space
           //textarea.setSelectionStart(origIndex + 1);
-          textarea.setSelectionEnd(textarea.getSelectionStop() - spaceCount);
-          textarea.setSelectedText("\n");
+          textarea.setSelectionEnd(textarea.getSelectionEnd() - spaceCount);
+          textareaComponent.setSelectedText("\n");
           textarea.setCaretPosition(textarea.getCaretPosition() + extraCount + spaceCount);
         } else {
           String insertion = "\n" + spaces(spaceCount);
-          textarea.setSelectedText(insertion);
+          textareaComponent.setSelectedText(insertion);
           textarea.setCaretPosition(textarea.getCaretPosition() + extraCount);
         }
 
@@ -250,7 +254,7 @@ public class JavaInputHandler extends PdeInputHandler {
             String s = spaces(tabSize);
             // if these are spaces that we can delete
             if (textarea.getSelectedText().equals(s)) {
-              textarea.setSelectedText("");
+              textareaComponent.setSelectedText("");
             } else {
               textarea.select(sel, sel);
             }
@@ -260,7 +264,7 @@ public class JavaInputHandler extends PdeInputHandler {
         // Enter/Return was being consumed by somehow even if false
         // was returned, so this is a band-aid to simply fire the event again.
         // http://dev.processing.org/bugs/show_bug.cgi?id=1073
-        textarea.setSelectedText(String.valueOf(c));
+        textareaComponent.setSelectedText(String.valueOf(c));
       }
       // mark this event as already handled (all but ignored)
       event.consume();
@@ -271,8 +275,8 @@ public class JavaInputHandler extends PdeInputHandler {
         // first remove anything that was there (in case this multiple
         // characters are selected, so that it's not in the way of the
         // spaces for the auto-indent
-        if (textarea.getSelectionStart() != textarea.getSelectionStop()) {
-          textarea.setSelectedText("");
+        if (textarea.getSelectionStart() != textarea.getSelectionEnd()) {
+          textareaComponent.setSelectedText("");
         }
 
         // if this brace is the only thing on the line, outdent
@@ -304,7 +308,7 @@ public class JavaInputHandler extends PdeInputHandler {
         if (pairedSpaceCount == -1) return false;
 
         textarea.setSelectionStart(lineStartIndex);
-        textarea.setSelectedText(spaces(pairedSpaceCount));
+        textareaComponent.setSelectedText(spaces(pairedSpaceCount));
 
         // mark this event as already handled
         event.consume();

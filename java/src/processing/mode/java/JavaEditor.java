@@ -20,6 +20,7 @@ import javax.swing.table.TableModel;
 import javax.swing.text.Document;
 
 import org.eclipse.jdt.core.compiler.IProblem;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import processing.core.PApplet;
 import processing.app.*;
@@ -108,7 +109,7 @@ public class JavaEditor extends Editor {
         handleShowUsage();
       }
     });
-    getTextArea().getRightClickPopup().add(showUsageItem);
+    getTextArea().getPopupMenu().add(showUsageItem);
 
     // add refactor option
     JMenuItem renameItem = new JMenuItem("Rename...");
@@ -124,7 +125,7 @@ public class JavaEditor extends Editor {
     //            System.out.println(evt);
     //          }
     //        });
-    textarea.getRightClickPopup().add(renameItem);
+    textarea.getPopupMenu().add(renameItem);
     // set action on frame close
     //        addWindowListener(new WindowAdapter() {
     //            @Override
@@ -133,7 +134,7 @@ public class JavaEditor extends Editor {
     //            }
     //        });
 
-    Toolkit.setMenuMnemonics(textarea.getRightClickPopup());
+    Toolkit.setMenuMnemonics(textarea.getPopupMenu());
 
     // load settings from theme.txt
     breakpointColor = mode.getColor("breakpoint.bgcolor");
@@ -154,11 +155,12 @@ public class JavaEditor extends Editor {
 
     errorCheckerService = new ErrorCheckerService(this);
     new Thread(errorCheckerService).start();
-
+/*
+    // TODO:
     // hack to add a JPanel to the right-hand side of the text area
     JPanel textAndError = new JPanel();
     // parent is a vertical box with the toolbar, the header, and the text area
-    Box box = (Box) textarea.getParent();
+    Box box = (Box) textareaComponent.getRTScrollPane().getParent();
     // remove the text area temporarily
     box.remove(2);
     textAndError.setLayout(new BorderLayout());
@@ -168,13 +170,13 @@ public class JavaEditor extends Editor {
     textAndError.add(textarea);
     // add our hacked version back to the editor
     box.add(textAndError);
-
-    getJavaTextArea().setMode(jmode);
+*/
+//   TODO:  getJavaTextArea().setMode(jmode);
 
     // ensure completion is hidden when editor loses focus
     addWindowFocusListener(new WindowFocusListener() {
       public void windowLostFocus(WindowEvent e) {
-        getJavaTextArea().hideSuggestion();
+//        TODO: getJavaTextArea().hideSuggestion();
       }
 
       public void windowGainedFocus(WindowEvent e) { }
@@ -360,7 +362,7 @@ public class JavaEditor extends Editor {
     item = Toolkit.newJMenuItemShift(Language.text("menu.help.find_in_reference"), 'F');
     item.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        if (textarea.isSelectionActive()) {
+        if (textareaComponent.isSelectionActive()) {
           handleFindReference();
         }
       }
@@ -1912,8 +1914,8 @@ public class JavaEditor extends Editor {
    * Access the custom text area object.
    * @return the text area object
    */
-  public JavaTextArea getJavaTextArea() {
-    return (JavaTextArea) textarea;
+  public RSyntaxTextArea getJavaTextArea() {
+    return textarea;
   }
 
 
@@ -2265,7 +2267,8 @@ public class JavaEditor extends Editor {
     cursorToLineStart(line.lineIdx());
     // highlight line
     currentLine = new LineHighlight(line.lineIdx(), currentLineColor, this);
-    currentLine.setMarker(getJavaTextArea().currentLineMarker, currentLineMarkerColor);
+//    TODO:
+//    currentLine.setMarker(getJavaTextArea().currentLineMarker, currentLineMarkerColor);
     currentLine.setPriority(10); // fixes current line being hidden by the breakpoint when moved down
   }
 
@@ -2294,7 +2297,8 @@ public class JavaEditor extends Editor {
    */
   public void addBreakpointedLine(LineID lineID) {
     LineHighlight hl = new LineHighlight(lineID, breakpointColor, this);
-    hl.setMarker(getJavaTextArea().breakpointMarker, breakpointMarkerColor);
+//  TODO:
+//  hl.setMarker(getJavaTextArea().breakpointMarker, breakpointMarkerColor);
     breakpointedLines.add(hl);
     // repaint current line if it's on this line
     if (currentLine != null && currentLine.getLineID().equals(lineID)) {
@@ -2350,8 +2354,9 @@ public class JavaEditor extends Editor {
     breakpointedLines.clear(); // remove all breakpoints
     // fix highlights not being removed when tab names have
     // changed due to opening a new sketch in same editor
-    getJavaTextArea().clearLineBgColors(); // force clear all highlights
-    getJavaTextArea().clearGutterText();
+    // TODO:
+//    getJavaTextArea().clearLineBgColors(); // force clear all highlights
+//    getJavaTextArea().clearGutterText();
 
     // repaint current line
     if (currentLine != null) {
@@ -2377,7 +2382,7 @@ public class JavaEditor extends Editor {
    */
   protected LineID getCurrentLineID() {
     String tab = getSketch().getCurrentCode().getFileName();
-    int lineNo = getTextArea().getCaretLine();
+    int lineNo = getTextArea().getCaretLineNumber();//.getCaretLine();
     return new LineID(tab, lineNo);
   }
 
@@ -2402,7 +2407,7 @@ public class JavaEditor extends Editor {
     //System.out.println("tab switch: " + code.getFileName());
     // set the new document in the textarea, etc. need to do this first
     super.setCode(code);
-
+/* TODO:
     // set line background colors for tab
     final JavaTextArea ta = getJavaTextArea();
     // can be null when setCode is called the first time (in constructor)
@@ -2426,7 +2431,7 @@ public class JavaEditor extends Editor {
           currentLine.paint();
         }
       }
-    }
+    }*/
     if (getDebugger() != null && getDebugger().isStarted()) {
       getDebugger().startTrackingLineChanges();
     }
@@ -2559,7 +2564,7 @@ public class JavaEditor extends Editor {
 
 
   public void updateErrorBar(List<Problem> problems) {
-    errorBar.updateErrorPoints(problems);
+//    TODO: errorBar.updateErrorPoints(problems);
   }
 
 
@@ -2614,14 +2619,14 @@ public class JavaEditor extends Editor {
 
   /** Handle refactor operation */
   private void handleRefactor() {
-    Base.log("Caret at:" + textarea.getLineText(textarea.getCaretLine()));
+//    Base.log("Caret at:" + textarea.getLineTextComponent(textarea.getCaretLineNumber()));
     errorCheckerService.getASTGenerator().handleRefactor();
   }
 
 
   /** Handle show usage operation */
   private void handleShowUsage() {
-    Base.log("Caret at:" + textarea.getLineText(textarea.getCaretLine()));
+    Base.log("Caret at:" + textareaComponent.getLineText(textarea.getCaretLineNumber()));
     errorCheckerService.getASTGenerator().handleShowUsage();
   }
 
@@ -2676,14 +2681,16 @@ public class JavaEditor extends Editor {
 
 
   protected void startInteractiveMode() {
-    getJavaTextArea().startInteractiveMode();
+    // TODO:
+//    getJavaTextArea().startInteractiveMode();
   }
 
 
   //public void stopInteractiveMode(ArrayList<Handle> handles[]) {
   protected void stopInteractiveMode(List<List<Handle>> handles) {
     tweakClient.shutdown();
-    getJavaTextArea().stopInteractiveMode();
+    // TODO:
+//    getJavaTextArea().stopInteractiveMode();
 
     // remove space from the code (before and after)
     //removeSpacesFromCode();
@@ -2754,7 +2761,8 @@ public class JavaEditor extends Editor {
 
   protected void updateInterface(List<List<Handle>> handles,
                               List<List<ColorControlBox>> colorBoxes) {
-    getJavaTextArea().updateInterface(handles, colorBoxes);
+    // TODO:
+//    getJavaTextArea().updateInterface(handles, colorBoxes);
   }
 
 

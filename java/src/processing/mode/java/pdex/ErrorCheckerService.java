@@ -1033,7 +1033,7 @@ public class ErrorCheckerService implements Runnable {
     if (JavaMode.errorCheckEnabled) {
       synchronized (editor.getErrorPoints()) {
         for (ErrorMarker emarker : editor.getErrorPoints()) {
-          if (emarker.getProblem().getLineNumber() == editor.getTextArea().getCaretLine()) {
+          if (emarker.getProblem().getLineNumber() == editor.getTextArea().getCaretLineNumber()) {
             if (emarker.getType() == ErrorMarker.Warning) {
               editor.statusMessage(emarker.getProblem().getMessage(),
                                    JavaEditor.STATUS_INFO);
@@ -1145,7 +1145,7 @@ public class ErrorCheckerService implements Runnable {
   public String getPDECodeAtLine(int tab, int linenumber){
     if(linenumber < 0) return null;
     editor.getSketch().setCurrentCode(tab);
-    return editor.getTextArea().getLineText(linenumber);
+    return editor.getLineText(linenumber);
   }
 
   /**
@@ -1468,7 +1468,8 @@ public class ErrorCheckerService implements Runnable {
       final Document doc = editor.getTextArea().getDocument();
       final int lineCount = Base.countLines(doc.getText(0, doc.getLength()));
       if (p.getLineNumber() < lineCount && p.getLineNumber() >= 0) {
-        editor.getTextArea().scrollTo(p.getLineNumber(), 0);
+        // TODO:
+//        editor.getTextArea().scrollTo(p.getLineNumber(), 0);
       }
       editor.repaint();
 
@@ -1493,9 +1494,9 @@ public class ErrorCheckerService implements Runnable {
    * @return - true, if scroll was successful
    */
   public static boolean scrollToErrorLine(Editor edt, int tabIndex, int lineNoInTab, int lineStartOffset, int length) {
-    if (edt == null) {
+//    if (edt == null) {
       return false;
-    }
+    /*} TODO:
     try {
       edt.toFront();
       edt.getSketch().setCurrentCode(tabIndex);
@@ -1512,7 +1513,7 @@ public class ErrorCheckerService implements Runnable {
       e.printStackTrace();
       return false;
     }
-    return true;
+    return true;*/
   }
 
   /**

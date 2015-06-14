@@ -102,6 +102,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -110,6 +111,7 @@ import processing.app.Base;
 import processing.app.Library;
 import processing.app.SketchCode;
 import processing.app.Toolkit;
+import processing.app.rsyntax.PDESyntaxTextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
@@ -1031,7 +1033,8 @@ public class ASTGenerator {
 //      tableAuto.validate();
 //      tableAuto.repaint();
 //    }
-    errorCheckerService.getEditor().getJavaTextArea().showSuggestion(defListModel, word);
+    // TODO:
+//    errorCheckerService.getEditor().getJavaTextArea().showSuggestion(defListModel, word);
   }
 
   private DefaultListModel<CompletionCandidate> filterPredictions(){
@@ -2051,7 +2054,7 @@ public class ASTGenerator {
                            + off, awrap.getNode()
                            .toString().length());
       //int k = JOptionPane.showConfirmDialog(new JFrame(), "Rename?","", JOptionPane.INFORMATION_MESSAGE);
-      editor.getTextArea().setSelectedText(newName);
+      editor.getTextAreaComponent().setSelectedText(newName);
     }
     editor.stopCompoundEdit();
     errorCheckerService.resumeThread();
@@ -2076,7 +2079,11 @@ public class ASTGenerator {
 //        + lineStartWSOffset + ",Len: " + length);
     editor.toFront();
     editor.getSketch().setCurrentCode(tab);
-    lineStartWSOffset += editor.getTextArea().getLineStartOffset(lineNumber);
+    try {
+      lineStartWSOffset += editor.getTextArea().getLineStartOffset(lineNumber);
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     editor.getTextArea().select(lineStartWSOffset, lineStartWSOffset + length);
   }
 
@@ -2131,24 +2138,28 @@ public class ASTGenerator {
   }
 
   protected DefaultMutableTreeNode findAllOccurrences(){
-    final JEditTextArea ta = editor.getTextArea();
+    final PDESyntaxTextArea ta = editor.getTextAreaComponent();
 
     log("Last clicked word:" + lastClickedWord);
-    String selText = lastClickedWord == null ? ta.getSelectedText() :
+    String selText = lastClickedWord == null ? ta.getRSTextArea().getSelectedText() :
         lastClickedWord;
     int line = ta.getSelectionStartLine();
-    log(selText
-        + "<- offsets "
-        + (line)
-        + ", "
-        + (ta.getSelectionStart() - ta.getLineStartOffset(line))
-        + ", "
-        + (ta.getSelectionStop() - ta.getLineStartOffset(line)));
+    try {
+      log(selText
+          + "<- offsets "
+          + (line)
+          + ", "
+          + (ta.getRSTextArea().getSelectionStart() - ta.getRSTextArea().getLineStartOffset(line))
+          + ", "
+          + (ta.getRSTextArea().getSelectionEnd() - ta.getRSTextArea().getLineStartOffset(line)));
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     int offwhitespace = ta.getLineStartNonWhiteSpaceOffset(line);
     ASTNodeWrapper wnode;
     if (lastClickedWord == null || lastClickedWordNode.getNode() == null) {
       wnode = getASTNodeAt(line + errorCheckerService.mainClassOffset, selText,
-                           ta.getSelectionStart() - offwhitespace, false);
+                           ta.getRSTextArea().getSelectionStart() - offwhitespace, false);
     }
     else{
       wnode = lastClickedWordNode;
@@ -3012,9 +3023,9 @@ public class ASTGenerator {
 
 
   protected boolean caretWithinLineComment() {
-    final JEditTextArea ta = editor.getTextArea();
-    String pdeLine = editor.getLineText(ta.getCaretLine()).trim();
-    int caretPos = ta.getCaretPosition() - ta.getLineStartNonWhiteSpaceOffset(ta.getCaretLine());
+    final PDESyntaxTextArea ta = editor.getTextAreaComponent();
+    String pdeLine = editor.getLineText(ta.getRSTextArea().getCaretLineNumber()).trim();
+    int caretPos = ta.getRSTextArea().getCaretPosition() - ta.getLineStartNonWhiteSpaceOffset(ta.getRSTextArea().getCaretLineNumber());
     int x = pdeLine.indexOf("//");
 
     if (x >= 0 && caretPos > x) {
@@ -3724,6 +3735,7 @@ public class ASTGenerator {
 
 
   private void hideSuggestion() {
-    ((JavaTextArea) editor.getTextArea()).hideSuggestion();
+    // TODO:
+//    ((JavaTextArea) editor.getTextArea()).hideSuggestion();
   }
 }

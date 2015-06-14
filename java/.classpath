@@ -22,5 +22,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-app"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
+	<classpathentry kind="lib" path="/processing-app/lib/rsyntaxtextarea-2.5.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

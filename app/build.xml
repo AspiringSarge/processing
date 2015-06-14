@@ -37,6 +37,7 @@
 	   classpath="../core/library/core.jar; 
                       ../core/apple.jar; 
                       lib/ant.jar; 
+                      lib/rsyntaxtextarea-2.5.6.jar;
                       lib/ant-launcher.jar; 
                       lib/jna.jar"
 	   debug="on"

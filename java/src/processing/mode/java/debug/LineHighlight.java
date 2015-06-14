@@ -157,8 +157,9 @@ public class LineHighlight {
     public void lineChanged(LineID line, int oldLineIdx, int newLineIdx) {
         // clear old line
         if (editor.isInCurrentTab(new LineID(line.fileName(), oldLineIdx))) {
-            editor.getJavaTextArea().clearLineBgColor(oldLineIdx);
-            editor.getJavaTextArea().clearGutterText(oldLineIdx);
+          // TODO:
+//            editor.getJavaTextArea().clearLineBgColor(oldLineIdx);
+//            editor.getJavaTextArea().clearGutterText(oldLineIdx);
         }
 
         // paint new line
@@ -184,13 +185,15 @@ public class LineHighlight {
      */
     public void paint() {
         if (editor.isInCurrentTab(lineID)) {
-            editor.getJavaTextArea().setLineBgColor(lineID.lineIdx(), bgColor);
+          // TODO:
+//            editor.getJavaTextArea().setLineBgColor(lineID.lineIdx(), bgColor);
             if (marker != null) {
-                if (markerColor != null) {
-                    editor.getJavaTextArea().setGutterText(lineID.lineIdx(), marker, markerColor);
-                } else {
-                    editor.getJavaTextArea().setGutterText(lineID.lineIdx(), marker);
-                }
+              // TODO:
+//                if (markerColor != null) {
+//                    editor.getJavaTextArea().setGutterText(lineID.lineIdx(), marker, markerColor);
+//                } else {
+//                    editor.getJavaTextArea().setGutterText(lineID.lineIdx(), marker);
+//                }
             }
         }
     }
@@ -199,9 +202,10 @@ public class LineHighlight {
      * Clear this line highlight.
      */
     public void clear() {
-        if (editor.isInCurrentTab(lineID)) {
-            editor.getJavaTextArea().clearLineBgColor(lineID.lineIdx());
-            editor.getJavaTextArea().clearGutterText(lineID.lineIdx());
-        }
+      // TODO:
+//        if (editor.isInCurrentTab(lineID)) {
+//            editor.getJavaTextArea().clearLineBgColor(lineID.lineIdx());
+//            editor.getJavaTextArea().clearGutterText(lineID.lineIdx());
+//        }
     }
 }

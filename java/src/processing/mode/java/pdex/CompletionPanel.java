@@ -48,7 +48,10 @@ import javax.swing.plaf.InsetsUIResource;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.text.BadLocationException;
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+
 import processing.app.Base;
+import processing.app.rsyntax.PDESyntaxTextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
@@ -378,7 +381,8 @@ public class CompletionPanel {
           // See #2755
           SwingWorker<Object, Object> worker = new SwingWorker<Object, Object>() {
             protected Object doInBackground() throws Exception {
-              ((JavaTextArea) editor.getTextArea()).fetchPhrase(null);
+              // TODO:
+//              ((JavaTextArea) editor.getTextArea()).fetchPhrase(null);
               return null;
             }
           };
@@ -399,19 +403,25 @@ public class CompletionPanel {
 
   private String fetchCurrentSubword() {
     //log("Entering fetchCurrentSubword");
-    JEditTextArea ta = editor.getTextArea();
-    int off = ta.getCaretPosition();
+    PDESyntaxTextArea ta = editor.getTextAreaComponent();
+    int off = ta.getRSTextArea().getCaretPosition();
     //log2("off " + off);
     if (off < 0)
       return null;
-    int line = ta.getCaretLine();
+    int line = ta.getRSTextArea().getCaretLineNumber();
     if (line < 0)
       return null;
     String s = ta.getLineText(line);
     //log2("lin " + line);
     //log2(s + " len " + s.length());
 
-    int x = ta.getCaretPosition() - ta.getLineStartOffset(line) - 1, x1 = x - 1;
+    int x=-1, x1 = -1;
+    try {
+      x = ta.getRSTextArea().getCaretPosition() - ta.getRSTextArea().getLineStartOffset(line) - 1;
+      x1 = x - 1;
+    } catch (BadLocationException e) {
+      e.printStackTrace();
+    }
     if (x >= s.length() || x < 0)
       return null; //TODO: Does this check cause problems? Verify.
     if (Base.DEBUG) System.out.print(" x char: " + s.charAt(x));
