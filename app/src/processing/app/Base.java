@@ -28,7 +28,6 @@ import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -149,7 +148,21 @@ public class Base {
     EventQueue.invokeLater(new Runnable() {
         public void run() {
           try {
+            final long startTime = System.nanoTime();
             createAndShowGUI(args);
+            final long stopTime = System.nanoTime();
+            new Thread( new Runnable() {
+              
+              @Override
+              public void run() {
+//                try {
+//                  Thread.sleep(5000);
+//                } catch (InterruptedException e) {
+//                  e.printStackTrace();
+//                }
+                System.out.println("Done in: " + (stopTime-startTime)/1000000);
+              }
+            }).start();
           } catch (Throwable t) {
             showBadnessTrace("It was not meant to be",
                              "A serious problem happened during startup. Please report:\n" +
