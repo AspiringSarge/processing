@@ -720,7 +720,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
       menubar.add(modeMenu);
     }
 
-    rebuildToolMenu();
+    buildToolMenu();
     menubar.add(getToolMenu());
 
     menubar.add(buildHelpMenu());
@@ -1162,6 +1162,27 @@ public abstract class Editor extends JFrame implements RunnerListener {
 //    contribTools = ToolContribution.list(Base.getSketchbookToolsFolder(), true);
 //  }
 
+  private static Object toolMenuLock = new Object();
+  public void buildToolMenu() {
+    if (toolsMenu == null) {
+      toolsMenu = new JMenu(Language.text("menu.tools"));
+    } else {
+      toolsMenu.removeAll();
+    }
+
+    Thread populateTools = new Thread (new Runnable() {
+      
+      @Override
+      public void run() {
+//        synchronized (toolMenuLock) {
+          loadTools();
+          populateToolMenu();
+//        }
+      }
+    });
+    populateTools.start();
+  }
+
 
   public void rebuildToolMenu() {
     if (toolsMenu == null) {
@@ -1171,21 +1192,39 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
 //    rebuildToolList();
-    coreTools = ToolContribution.loadAll(Base.getToolsFolder());
-    contribTools = ToolContribution.loadAll(Base.getSketchbookToolsFolder());
+    loadTools();
+    populateToolMenu();
+  }
 
-    addInternalTools(toolsMenu);
-    addTools(toolsMenu, coreTools);
-    addTools(toolsMenu, contribTools);
 
-    toolsMenu.addSeparator();
-    JMenuItem item = new JMenuItem(Language.text("menu.tools.add_tool"));
-    item.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        base.handleOpenToolManager();
+  private void loadTools() {
+    synchronized (toolMenuLock) {
+      coreTools = ToolContribution.loadAll(Base.getToolsFolder());
+      contribTools = ToolContribution.loadAll(Base.getSketchbookToolsFolder());
+    }
+  }
+
+
+  private void populateToolMenu() {
+    EventQueue.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        synchronized (toolMenuLock) {
+          addInternalTools(toolsMenu);
+          addTools(toolsMenu, coreTools);
+          addTools(toolsMenu, contribTools);
+
+          toolsMenu.addSeparator();
+          JMenuItem item = new JMenuItem(Language.text("menu.tools.add_tool"));
+          item.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              base.handleOpenToolManager();
+            }
+          });
+          toolsMenu.add(item);
+        }
       }
     });
-    toolsMenu.add(item);
   }
 
 
