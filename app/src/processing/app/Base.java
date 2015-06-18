@@ -420,17 +420,26 @@ public class Base {
         logf("Could not find mode %s, using default.", lastModeIdentifier); //$NON-NLS-1$
       }
     }
+    
+    Thread initializeManagers = new Thread (new Runnable() {
+      
+      @Override
+      public void run() {
 
-    libraryManagerFrame =
-      new ContributionManagerDialog(ContributionType.LIBRARY);
-    toolManagerFrame =
-      new ContributionManagerDialog(ContributionType.TOOL);
-    modeManagerFrame =
-      new ContributionManagerDialog(ContributionType.MODE);
-    exampleManagerFrame =
-      new ContributionManagerDialog(ContributionType.EXAMPLES);
-    updateManagerFrame =
-      new ContributionManagerDialog(null);
+        libraryManagerFrame =
+          new ContributionManagerDialog(ContributionType.LIBRARY);
+        toolManagerFrame =
+          new ContributionManagerDialog(ContributionType.TOOL);
+        modeManagerFrame =
+          new ContributionManagerDialog(ContributionType.MODE);
+        exampleManagerFrame =
+          new ContributionManagerDialog(ContributionType.EXAMPLES);
+        updateManagerFrame =
+          new ContributionManagerDialog(null);
+        
+      }
+    });
+    initializeManagers.run();    
 
     // Make sure ThinkDifferent has library examples too
     nextMode.rebuildLibraryList();
