@@ -355,15 +355,27 @@ public class Base {
 
 
   /**
-   * Instantiates and adds new contributed modes to the contribModes list.
-   * Checks for duplicates so the same mode isn't instantiates twice. Does not
-   * remove modes because modes can't be removed once they are instantiated.
+   * Instantiates and adds new contributed examples to the exampleContribs list.
+   * Checks for duplicates so the same example isn't instantiated twice.
    */
   void rebuildContribExamples() {
     if (exampleContribs == null) {
+      // examplesContribs is being instantiated for the first time
       exampleContribs = new ArrayList<ExamplesContribution>();
+      
+      // Load missing contributions on a new thread to make things faster 
+      Thread examplesThread = new Thread(new Runnable() {
+        
+        @Override
+        public void run() {
+          ExamplesContribution.loadMissing(Base.this);
+        }
+      });
+      examplesThread.start();
     }
-    ExamplesContribution.loadMissing(this);
+    else {
+      ExamplesContribution.loadMissing(Base.this);
+    }
   }
 
 
