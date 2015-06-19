@@ -442,7 +442,6 @@ public class Base {
     initializeManagers.run();    
 
     // Make sure ThinkDifferent has library examples too
-    nextMode.rebuildLibraryList();
 
     // Put this after loading the examples, so that building the default file
     // menu works on Mac OS X (since it needs examplesFolder to be set).
