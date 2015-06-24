@@ -110,6 +110,7 @@ import processing.app.Base;
 import processing.app.Library;
 import processing.app.SketchCode;
 import processing.app.Toolkit;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
@@ -2131,7 +2132,7 @@ public class ASTGenerator {
   }
 
   protected DefaultMutableTreeNode findAllOccurrences(){
-    final JEditTextArea ta = editor.getTextArea();
+    final PDETextArea ta = editor.getTextArea();
 
     log("Last clicked word:" + lastClickedWord);
     String selText = lastClickedWord == null ? ta.getSelectedText() :
@@ -3012,7 +3013,7 @@ public class ASTGenerator {
 
 
   protected boolean caretWithinLineComment() {
-    final JEditTextArea ta = editor.getTextArea();
+    final PDETextArea ta = editor.getTextArea();
     String pdeLine = editor.getLineText(ta.getCaretLine()).trim();
     int caretPos = ta.getCaretPosition() - ta.getLineStartNonWhiteSpaceOffset(ta.getCaretLine());
     int x = pdeLine.indexOf("//");

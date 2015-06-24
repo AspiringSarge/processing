@@ -49,6 +49,7 @@ import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.text.BadLocationException;
 
 import processing.app.Base;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
@@ -103,7 +104,7 @@ public class CompletionPanel {
    * @param location - Point location where popup list is to be displayed
    * @param dedit
    */
-  public CompletionPanel(final JEditTextArea textarea, int position, String subWord,
+  public CompletionPanel(final PDETextArea textarea, int position, String subWord,
                          DefaultListModel<CompletionCandidate> items, final Point location, JavaEditor editor) {
     this.textarea = (JavaTextArea) textarea;
     this.editor = editor;
@@ -399,7 +400,7 @@ public class CompletionPanel {
 
   private String fetchCurrentSubword() {
     //log("Entering fetchCurrentSubword");
-    JEditTextArea ta = editor.getTextArea();
+    PDETextArea ta = editor.getTextArea();
     int off = ta.getCaretPosition();
     //log2("off " + off);
     if (off < 0)

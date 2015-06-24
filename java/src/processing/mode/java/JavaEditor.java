@@ -30,6 +30,7 @@ import processing.app.contrib.Contribution;
 import processing.app.contrib.ContributionListing;
 import processing.app.contrib.ContributionManager;
 import processing.app.contrib.ToolContribution;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
 import processing.mode.java.debug.LineBreakpoint;
@@ -158,6 +159,8 @@ public class JavaEditor extends Editor {
 
     // hack to add a JPanel to the right-hand side of the text area
     JPanel textAndError = new JPanel();
+    
+    /* TODO: RSTA 
     // parent is a vertical box with the toolbar, the header, and the text area
     Box box = (Box) textarea.getParent();
     // remove the text area temporarily
@@ -169,7 +172,7 @@ public class JavaEditor extends Editor {
     textAndError.add(textarea);
     // add our hacked version back to the editor
     box.add(textAndError);
-
+    */
     getJavaTextArea().setMode(jmode);
 
     // ensure completion is hidden when editor loses focus
@@ -183,7 +186,7 @@ public class JavaEditor extends Editor {
   }
 
 
-  protected JEditTextArea createTextArea() {
+  protected PDETextArea createTextArea() {
     return new JavaTextArea(new PdeTextAreaDefaults(mode), this);
   }
 

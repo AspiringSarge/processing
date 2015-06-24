@@ -24,6 +24,8 @@
 package processing.app;
 
 import processing.app.contrib.ToolContribution;
+import processing.app.rsta.PDEScrollBar;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.*;
 import processing.app.tools.*;
 import processing.core.*;
@@ -53,6 +55,8 @@ import javax.swing.event.*;
 import javax.swing.plaf.basic.*;
 import javax.swing.text.*;
 import javax.swing.undo.*;
+
+import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 
 
 /**
@@ -92,7 +96,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
   protected EditorHeader header;
   protected EditorToolbar toolbar;
-  protected JEditTextArea textarea;
+  protected PDETextArea textarea;
+  protected PDEScrollBar scrollbar;
   protected EditorStatus status;
   protected JSplitPane splitPane;
   protected EditorFooter footer;
@@ -246,13 +251,15 @@ public abstract class Editor extends JFrame implements RunnerListener {
     header = createHeader();
     upper.add(header);
 
-    textarea = createTextArea();
+    textarea = createTextArea();//new PDETextArea(new PdeTextAreaDefaults(mode));
+    scrollbar = new PDEScrollBar(textarea);
+    
     textarea.setRightClickPopup(new TextAreaPopup());
     textarea.setHorizontalOffset(JEditTextArea.leftHandGutter);
 
     footer = createFooter();
 
-    upper.add(textarea);
+    upper.add(scrollbar);
 
     // alternate spot for status, but ugly
 //    status = new EditorStatus(this);
@@ -385,9 +392,9 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * Broken out to get modes working for GSOC, but this needs a longer-term
    * solution where the listeners are handled properly.
    */
-  protected JEditTextArea createTextArea() {
-    return new JEditTextArea(new PdeTextAreaDefaults(mode),
-                             new PdeInputHandler());
+  protected PDETextArea createTextArea() {
+    return new PDETextArea(new PdeTextAreaDefaults(mode));
+//    TODO: We don't need an input handler, do we?  new PdeInputHandler());
     /*
     return new JEditTextArea(new PdeTextAreaDefaults(mode), new PdeInputHandler()) {
       // this is a kludge that needs to be removed [fry 150120]
@@ -665,8 +672,9 @@ public abstract class Editor extends JFrame implements RunnerListener {
    */
   protected void applyPreferences() {
     // Update fonts and other items controllable from the prefs
-    textarea.getPainter().updateAppearance();
-    textarea.repaint();
+    
+    // TODO: RSTA Check
+    textarea.updateAppearance();
 
     console.updateAppearance();
 
@@ -1529,7 +1537,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
         final Integer caret = caretUndoStack.pop();
         caretRedoStack.push(caret);
         textarea.setCaretPosition(caret);
-        textarea.scrollToCaret();
+        // This is done automatically when caret is set 
+//        textarea.scrollToCaret();
       } catch (Exception ignore) {
       }
       try {
@@ -1719,7 +1728,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * found in this class. This will maintain compatibility with future releases,
    * which will not use JEditTextArea.
    */
-  public JEditTextArea getTextArea() {
+  public PDETextArea getTextArea() {
     return textarea;
   }
 
@@ -1901,7 +1910,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
 
 
   public int getScrollPosition() {
-    return textarea.getVerticalScrollPosition();
+    return scrollbar.getVerticalScrollPosition();
   }
 
 
@@ -1913,14 +1922,18 @@ public abstract class Editor extends JFrame implements RunnerListener {
    * that's currently being manipulated.
    */
   protected void setCode(SketchCode code) {
-    SyntaxDocument document = (SyntaxDocument) code.getDocument();
+    RSyntaxDocument document = (RSyntaxDocument) code.getDocument();
 
     if (document == null) {  // this document not yet inited
-      document = new SyntaxDocument();
+      
+      // TODO: RSTA Check
+      document = new RSyntaxDocument("");
+      
       code.setDocument(document);
 
+//      TODO: RSTA
       // turn on syntax highlighting
-      document.setTokenMarker(mode.getTokenMarker());
+//      document.setTokenMarker(mode.getTokenMarker());
 
       // insert the program text into the document object
       try {
@@ -2173,7 +2186,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
       } else {
         // replace with new bootiful text
         // selectionEnd hopefully at least in the neighborhood
-        int scrollPos = textarea.getVerticalScrollPosition();
+        int scrollPos = scrollbar.getVerticalScrollPosition();
         setText(formattedText);
         setSelection(selectionEnd, selectionEnd);
 
@@ -2181,14 +2194,14 @@ public abstract class Editor extends JFrame implements RunnerListener {
         // Since we're not doing a good job of maintaining position anyway,
         // a more complicated workaround here is fairly pointless.
         // http://code.google.com/p/processing/issues/detail?id=1533
-        if (scrollPos != textarea.getVerticalScrollPosition()) {
+        if (scrollPos != scrollbar.getVerticalScrollPosition()) {
 //          boolean wouldBeVisible =
 //            scrollPos >= textarea.getFirstLine() &&
 //            scrollPos < textarea.getLastLine();
 //
 //          // if it was visible, and now it's not, then allow the scroll
 //          if (!(wasVisible && !wouldBeVisible)) {
-          textarea.setVerticalScrollPosition(scrollPos);
+          scrollbar.setVerticalScrollPosition(scrollPos);
 //          }
         }
         getSketch().setModified(true);

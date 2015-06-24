@@ -38,6 +38,7 @@ import javax.swing.SwingWorker;
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.Mode;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
 import processing.app.syntax.TextAreaDefaults;
@@ -52,7 +53,7 @@ import processing.app.syntax.TextAreaDefaults;
 //      To fix, we need to clean this up and put the appropriate cross-Mode
 //      changes into JEditTextArea (or a subclass in processing.app)
 
-public class JavaTextArea extends JEditTextArea {
+public class JavaTextArea extends PDETextArea {
   protected PdeTextAreaDefaults defaults;
   protected JavaEditor editor;
 
@@ -85,14 +86,14 @@ public class JavaTextArea extends JEditTextArea {
 //  protected ErrorCheckerService errorCheckerService;
   private CompletionPanel suggestion;
 
-
+  //TODO: RSTA
   protected JavaTextAreaPainter getCustomPainter() {
-    return (JavaTextAreaPainter) painter;
+    return null;//return (JavaTextAreaPainter) painter;
   }
 
 
   public JavaTextArea(TextAreaDefaults defaults, JavaEditor editor) {
-    super(defaults, new JavaInputHandler(editor));
+    super(defaults);//TODO: RSTA Check, new JavaInputHandler(editor));
     this.editor = editor;
 
     // removed all this since we have the createPainter() method and we
@@ -105,7 +106,10 @@ public class JavaTextArea extends JEditTextArea {
 //    // replace the painter:
 //    // first save listeners, these are package-private in JEditTextArea, so not accessible
 //    ComponentListener[] componentListeners = painter.getComponentListeners();
-    mouseListeners = painter.getMouseListeners();
+    
+    // TODO: RSTA
+    //    mouseListeners = painter.getMouseListeners();
+    
 //    MouseMotionListener[] mouseMotionListeners = painter.getMouseMotionListeners();
 //
 //    remove(painter);
@@ -121,13 +125,14 @@ public class JavaTextArea extends JEditTextArea {
 //    for (MouseMotionListener mml : mouseMotionListeners) {
 //      painter.addMouseMotionListener(mml);
 //    }
-
+    /* TODO: RSTA
     // use a custom mouse handler instead of directly using mouseListeners
     MouseHandler mouseHandler = new MouseHandler();
     painter.addMouseListener(mouseHandler);
     painter.addMouseMotionListener(mouseHandler);
     //addCompletionPopupListner();
     add(CENTER, painter);
+    */
 
     // load settings from theme.txt
     Mode mode = editor.getMode();
@@ -138,10 +143,11 @@ public class JavaTextArea extends JEditTextArea {
     currentLineMarker = mode.getString("currentline.marker"); //, currentLineMarker);
 
     // TweakMode code
+    /* TODO: RSTA
     prevCompListeners = painter.getComponentListeners();
     prevMouseListeners = painter.getMouseListeners();
     prevMMotionListeners = painter.getMouseMotionListeners();
-    prevKeyListeners = editor.getKeyListeners();
+    prevKeyListeners = editor.getKeyListeners();*/
 
     interactiveMode = false;
     addPrevListeners();
@@ -161,7 +167,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void setMode(JavaMode mode) {
 //    errorCheckerService = ecs;
-    getCustomPainter().setMode(mode);
+    //TODO: RSTA
+//    getCustomPainter().setMode(mode);
   }
 
 
@@ -285,7 +292,7 @@ public class JavaTextArea extends JEditTextArea {
           protected Object doInBackground() throws Exception {
             // Provide completions only if it's enabled
             if (JavaMode.codeCompletionsEnabled) {
-              getDocument().remove(getCaretPosition() - 1, 1); // Remove the typed space
+              JavaTextArea.this.getDocument().remove(getCaretPosition() - 1, 1); // Remove the typed space
               Base.log("[KeyEvent]" + event.getKeyChar() + "  |Prediction started");
               Base.log("Typing: " + fetchPhrase(event));
             }
@@ -322,11 +329,15 @@ public class JavaTextArea extends JEditTextArea {
 
 
   /**
+   * TODO: RSTA
+   * 
    * Retrieves the word on which the mouse pointer is present
    * @param evt - the MouseEvent which triggered this method
    */
   private String fetchPhrase(MouseEvent evt) {
     Base.log("--handle Mouse Right Click--");
+    return "";
+    /*
     int off = xyToOffset(evt.getX(), evt.getY());
     if (off < 0)
       return null;
@@ -384,7 +395,7 @@ public class JavaTextArea extends JEditTextArea {
       Base.log("Mouse click, word: " + word.trim());
       editor.getErrorChecker().getASTGenerator().setLastClickedWord(line, word, xLS);
       return word.trim();
-    }
+    }*/
   }
 
 
@@ -553,7 +564,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void setGutterText(int lineIdx, String text) {
     gutterText.put(lineIdx, text);
-    painter.invalidateLine(lineIdx);
+//    TODO :RSTA
+//    painter.invalidateLine(lineIdx);
   }
 
 
@@ -581,7 +593,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void clearGutterText(int lineIdx) {
     gutterText.remove(lineIdx);
-    painter.invalidateLine(lineIdx);
+//    TODO: RSTA
+//    painter.invalidateLine(lineIdx);
   }
 
 
@@ -590,7 +603,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void clearGutterText() {
     for (int lineIdx : gutterText.keySet()) {
-      painter.invalidateLine(lineIdx);
+//      TODO: RSTA
+//      painter.invalidateLine(lineIdx);
     }
     gutterText.clear();
   }
@@ -630,7 +644,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void setLineBgColor(int lineIdx, Color col) {
     lineColors.put(lineIdx, col);
-    painter.invalidateLine(lineIdx);
+//    TODO: RSTA
+//    painter.invalidateLine(lineIdx);
   }
 
 
@@ -642,7 +657,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void clearLineBgColor(int lineIdx) {
     lineColors.remove(lineIdx);
-    painter.invalidateLine(lineIdx);
+//  TODO: RSTA
+//    painter.invalidateLine(lineIdx);
   }
 
 
@@ -651,7 +667,8 @@ public class JavaTextArea extends JEditTextArea {
    */
   public void clearLineBgColors() {
     for (int lineIdx : lineColors.keySet()) {
-      painter.invalidateLine(lineIdx);
+//    TODO: RSTA
+//      painter.invalidateLine(lineIdx);
     }
     lineColors.clear();
   }
@@ -670,6 +687,7 @@ public class JavaTextArea extends JEditTextArea {
 
 
   /**
+   * TODO: RSTA
    * Convert a character offset to a horizontal pixel position inside the text
    * area. Overridden to take gutter width into account.
    *
@@ -679,13 +697,15 @@ public class JavaTextArea extends JEditTextArea {
    *          the character offset (0 is the first character on a line)
    * @return the horizontal position
    */
-  @Override
+//  @Override
   public int _offsetToX(int line, int offset) {
-    return super._offsetToX(line, offset) + Editor.LEFT_GUTTER;
+//    return super._offsetToX(line, offset) + Editor.LEFT_GUTTER;
+    return 0;
   }
 
 
   /**
+   * TODO: RSTA
    * Convert a horizontal pixel position to a character offset. Overridden to
    * take gutter width into account.
    *
@@ -695,9 +715,10 @@ public class JavaTextArea extends JEditTextArea {
    *          the horizontal pixel position
    * @return he character offset (0 is the first character on a line)
    */
-  @Override
+//  @Override
   public int xToOffset(int line, int x) {
-    return super.xToOffset(line, x - Editor.LEFT_GUTTER);
+//    return super.xToOffset(line, x - Editor.LEFT_GUTTER);
+    return 0;
   }
 
 
@@ -784,11 +805,13 @@ public class JavaTextArea extends JEditTextArea {
       // No need to forward since the standard MouseMotionListeners are called anyway
       if (me.getX() < Editor.LEFT_GUTTER) {
         if (lastX >= Editor.LEFT_GUTTER) {
-          painter.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+//          TODO: RSTA
+//          painter.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
       } else {
         if (lastX < Editor.LEFT_GUTTER) {
-          painter.setCursor(new Cursor(Cursor.TEXT_CURSOR));
+//        TODO: RSTA
+//          painter.setCursor(new Cursor(Cursor.TEXT_CURSOR));
         }
       }
       lastX = me.getX();
@@ -826,10 +849,13 @@ public class JavaTextArea extends JEditTextArea {
       int position = getCaretPosition();
       Point location = new Point();
       try {
-        location.x = offsetToX(getCaretLine(), position
+        location.x = 0;
+/*        TODO: RSTA
+            offsetToX(getCaretLine(), position
                                - getLineStartOffset(getCaretLine()));
         location.y = lineToY(getCaretLine())
             + getPainter().getFontMetrics().getHeight() + getPainter().getFontMetrics().getDescent();
+                               */
         //log("TA position: " + location);
       } catch (Exception e2) {
         e2.printStackTrace();
@@ -865,8 +891,9 @@ public class JavaTextArea extends JEditTextArea {
   KeyListener[] prevKeyListeners;
   boolean interactiveMode;
 
-  /* remove all standard interaction listeners */
-  public void removeAllListeners() {
+  /* TODO: RSTA
+   * remove all standard interaction listeners */
+  public void removeAllListeners() {/*
     ComponentListener[] componentListeners = painter.getComponentListeners();
     MouseListener[] mouseListeners = painter.getMouseListeners();
     MouseMotionListener[] mouseMotionListeners = painter.getMouseMotionListeners();
@@ -883,7 +910,7 @@ public class JavaTextArea extends JEditTextArea {
     }
     for (KeyListener kl : keyListeners) {
       editor.removeKeyListener(kl);
-    }
+    }*/
   }
 
 
@@ -895,9 +922,12 @@ public class JavaTextArea extends JEditTextArea {
 
     // add our private interaction listeners
     getCustomPainter().startInterativeMode();
-    this.editable = false;
-    this.caretBlinks = false;
-    this.setCaretVisible(false);
+    
+    // TODO: RSTA Check these 3 lines
+    this.setEditable(false);
+//    this.caretBlinks = false;
+    this.getCaret().setVisible(false);
+    
     interactiveMode = true;
   }
 
@@ -910,19 +940,22 @@ public class JavaTextArea extends JEditTextArea {
     addPrevListeners();
 
     getCustomPainter().stopInteractiveMode();
-    this.editable = true;
-    this.caretBlinks = true;
-    this.setCaretVisible(true);
+    
+    // TODO: RSTA Check these 3 lines
+    this.setEditable(true);
+//    this.caretBlinks = true;
+    this.getCaret().setVisible(true);
+    
     interactiveMode = false;
   }
 
 
   public int getHorizontalScroll() {
-    return horizontal.getValue();
+    return scrollbar.getHorizontalScrollBar().getValue();
   }
 
-
-  private void addPrevListeners() {
+//  TODO: RSTA
+  private void addPrevListeners() {/*
     // add the original text-edit listeners
     for (ComponentListener cl : prevCompListeners) {
       painter.addComponentListener(cl);
@@ -935,7 +968,7 @@ public class JavaTextArea extends JEditTextArea {
     }
     for (KeyListener kl : prevKeyListeners) {
       editor.addKeyListener(kl);
-    }
+    }*/
   }
 
 

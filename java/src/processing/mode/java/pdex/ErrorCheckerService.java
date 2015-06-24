@@ -1468,7 +1468,7 @@ public class ErrorCheckerService implements Runnable {
       final Document doc = editor.getTextArea().getDocument();
       final int lineCount = Base.countLines(doc.getText(0, doc.getLength()));
       if (p.getLineNumber() < lineCount && p.getLineNumber() >= 0) {
-        editor.getTextArea().scrollTo(p.getLineNumber(), 0);
+        editor.getTextArea().getScrollbar().scrollTo(p.getLineNumber(), 0);
       }
       editor.repaint();
 
@@ -1502,7 +1502,7 @@ public class ErrorCheckerService implements Runnable {
       int lsno = edt.getTextArea()
           .getLineStartNonWhiteSpaceOffset(lineNoInTab - 1) + lineStartOffset;
       edt.setSelection(lsno, lsno + length);
-      edt.getTextArea().scrollTo(lineNoInTab - 1, 0);
+      edt.getTextArea().getScrollbar().scrollTo(lineNoInTab - 1, 0);
       edt.repaint();
       Base.log(lineStartOffset + " LSO,len " + length);
 

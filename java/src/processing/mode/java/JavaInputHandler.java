@@ -27,6 +27,7 @@ package processing.mode.java;
 import processing.app.Editor;
 import processing.app.Preferences;
 import processing.app.Sketch;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.*;
 
 import java.awt.*;
@@ -65,7 +66,7 @@ public class JavaInputHandler extends PdeInputHandler {
     int code = event.getKeyCode();
 
     Sketch sketch = editor.getSketch();
-    JEditTextArea textarea = editor.getTextArea();
+    PDETextArea textarea = editor.getTextArea();
 
     if ((event.getModifiers() & InputEvent.META_MASK) != 0) {
       //event.consume();  // does nothing
