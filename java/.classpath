@@ -22,6 +22,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-app"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
-	<classpathentry kind="lib" path="/processing-app/lib/rsyntaxtextarea-2.5.6.jar"/>
+	<classpathentry kind="lib" path="/processing-app/lib/rsyntaxtextarea-2.5.6.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://javadoc.fifesoft.com/rsyntaxtextarea/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

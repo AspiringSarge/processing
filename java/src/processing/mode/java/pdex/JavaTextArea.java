@@ -32,12 +32,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.scene.layout.Border;
+
 import javax.swing.DefaultListModel;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
 
 import processing.app.Base;
 import processing.app.Editor;
 import processing.app.Mode;
+import processing.app.rsta.PDEScrollBar;
 import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
@@ -71,6 +75,15 @@ public class JavaTextArea extends PDETextArea {
   protected int gutterPadding; // = 3;
   protected Color gutterBgColor; // = new Color(252, 252, 252); // gutter background color
   protected Color gutterLineColor; // = new Color(233, 233, 233); // color of vertical separation line
+  
+  public Color errorColor; // = new Color(0xED2630);
+  public Color warningColor; // = new Color(0xFFC30E);
+  public Color errorMarkerColor; // = new Color(0xED2630);
+  public Color warningMarkerColor; // = new Color(0xFFC30E);
+
+  protected Font gutterTextFont;
+  protected Color gutterTextColor;
+  protected Color gutterLineHighlightColor;
 
   /// the text marker for highlighting breakpoints in the gutter
   public String breakpointMarker = "<>";
@@ -134,14 +147,8 @@ public class JavaTextArea extends PDETextArea {
     add(CENTER, painter);
     */
 
-    // load settings from theme.txt
-    Mode mode = editor.getMode();
-    gutterBgColor = mode.getColor("gutter.bgcolor");  //, gutterBgColor);
-    gutterLineColor = mode.getColor("gutter.linecolor"); //, gutterLineColor);
-    gutterPadding = mode.getInteger("gutter.padding");
-    breakpointMarker = mode.getString("breakpoint.marker");  //, breakpointMarker);
-    currentLineMarker = mode.getString("currentline.marker"); //, currentLineMarker);
-
+    loadThemeSettings();
+    
     // TweakMode code
     /* TODO: RSTA
     prevCompListeners = painter.getComponentListeners();
@@ -151,6 +158,55 @@ public class JavaTextArea extends PDETextArea {
 
     interactiveMode = false;
     addPrevListeners();
+  }
+  
+  
+  /**
+   * Load settings from theme.txt
+   */
+  protected void loadThemeSettings() {
+    Mode mode = editor.getMode();
+    gutterBgColor = mode.getColor("gutter.bgcolor");  //, gutterBgColor);
+    gutterLineColor = mode.getColor("gutter.linecolor"); //, gutterLineColor);
+    gutterPadding = mode.getInteger("gutter.padding");
+    breakpointMarker = mode.getString("breakpoint.marker");  //, breakpointMarker);
+    currentLineMarker = mode.getString("currentline.marker"); //, currentLineMarker);
+
+    gutterTextFont = mode.getFont("editor.gutter.text.font");
+    gutterTextColor = mode.getColor("editor.gutter.text.color");
+    gutterLineHighlightColor = mode.getColor("editor.gutter.linehighlight.color");
+    
+    errorColor = mode.getColor("editor.errorcolor"); //, errorColor);
+    warningColor = mode.getColor("editor.warningcolor"); //, warningColor);
+    errorMarkerColor = mode.getColor("editor.errormarkercolor"); //, errorMarkerColor);
+    warningMarkerColor = mode.getColor("editor.warningmarkercolor"); //, warningMarkerColor);
+    
+    this.defaults = new PdeTextAreaDefaults(mode);
+  }
+
+
+  public void setScrollbar(PDEScrollBar scrollbar) {
+    super.setScrollbar(scrollbar);
+    setGutterUI();
+  }
+
+
+  public void setGutterUI() {
+    this.scrollbar.getGutter().setBackground(gutterBgColor);
+    this.scrollbar.getGutter().setLineNumberColor(gutterTextColor);
+    this.scrollbar.getGutter().setLineNumberFont(gutterTextFont);
+    
+    // TODO: RSTA- this is wrong: figure out how to set background of current line
+//    this.scrollbar.getGutter().setActiveLineRangeColor(gutterLineHighlightColor);
+    
+    this.scrollbar.getGutter().setBookmarkingEnabled(true);
+    this.scrollbar.getGutter().setIconRowHeaderInheritsGutterBackground(true);
+    this.setCurrentLineHighlightColor(defaults.lineHighlightColor);
+    
+    // TODO: RSTA- handle padding
+    this.scrollbar.setBorder(new EmptyBorder(0, 0, 0, 0));
+    this.setBorder(new EmptyBorder(0, 0, 0, 0));
+    this.scrollbar.getGutter().setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
   }
 
 

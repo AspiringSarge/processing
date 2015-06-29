@@ -19,6 +19,7 @@ import javax.swing.text.*;
 import javax.swing.JComponent;
 
 import processing.app.Preferences;
+import processing.app.rsta.PDETextArea;
 import processing.app.syntax.im.CompositionTextPainter;
 
 
@@ -34,7 +35,7 @@ public class TextAreaPainter extends JComponent implements TabExpander {
   /** A specific painter composed by the InputMethod.*/
   protected CompositionTextPainter compositionTextPainter;
 
-  protected JEditTextArea textArea;
+  protected PDETextArea textArea;
   protected TextAreaDefaults defaults;
 
 //  protected boolean blockCaret;
@@ -71,8 +72,8 @@ public class TextAreaPainter extends JComponent implements TabExpander {
   /**
    * Creates a new repaint manager. This should be not be called directly.
    */
-  public TextAreaPainter(JEditTextArea textArea, TextAreaDefaults defaults) {
-    this.textArea = textArea;
+  public TextAreaPainter(PDETextArea textArea2, TextAreaDefaults defaults) {
+    this.textArea = textArea2;
     this.defaults = defaults;
 
     setAutoscrolls(true);

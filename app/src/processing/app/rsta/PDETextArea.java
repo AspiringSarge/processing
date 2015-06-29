@@ -12,6 +12,7 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
 import javax.swing.JPopupMenu;
+import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
 
