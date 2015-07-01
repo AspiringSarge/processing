@@ -20,6 +20,9 @@ import javax.swing.table.TableModel;
 import javax.swing.text.Document;
 
 import org.eclipse.jdt.core.compiler.IProblem;
+import org.fife.ui.rsyntaxtextarea.ErrorStrip;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.parser.TaskTagParser;
 
 import processing.core.PApplet;
 import processing.data.StringList;
@@ -81,6 +84,7 @@ public class JavaEditor extends Editor {
 //  private EditorToolbar javaToolbar;
 //  private DebugToolbar debugToolbar;
 
+  private ErrorStrip es;
   private ErrorColumn errorBar;
 
 //  protected XQConsoleToggle btnShowConsole;
@@ -157,22 +161,14 @@ public class JavaEditor extends Editor {
     errorCheckerService = new ErrorCheckerService(this);
     new Thread(errorCheckerService).start();
 
-    // hack to add a JPanel to the right-hand side of the text area
-    JPanel textAndError = new JPanel();
-    
-    /* TODO: RSTA 
-    // parent is a vertical box with the toolbar, the header, and the text area
-    Box box = (Box) textarea.getParent();
-    // remove the text area temporarily
+    // Hack to add in error bar
+    Box box = (Box) scrollbar.getParent();
+    // remove scrollbar panel
     box.remove(2);
-    textAndError.setLayout(new BorderLayout());
-    errorBar =  new ErrorColumn(this, textarea.getMinimumSize().height, jmode);
-    textAndError.add(errorBar, BorderLayout.EAST);
-    textarea.setBounds(0, 0, errorBar.getX() - 1, textarea.getHeight());
-    textAndError.add(textarea);
-    // add our hacked version back to the editor
-    box.add(textAndError);
-    */
+    // add back panel with scrollbar + errorbar
+    es = null;
+    box.add(addParserAndErrorBar());
+    
     getJavaTextArea().setMode(jmode);
 
     // ensure completion is hidden when editor loses focus
@@ -183,6 +179,7 @@ public class JavaEditor extends Editor {
 
       public void windowGainedFocus(WindowEvent e) { }
     });
+    
   }
 
 
@@ -268,6 +265,38 @@ public class JavaEditor extends Editor {
 
   public Formatter createFormatter() {
     return new AutoFormat();
+  }
+
+
+  // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+
+  public JPanel addParserAndErrorBar() {
+    addParsers();
+    
+    JPanel errorScrollTextPanel = getErrorBarPanel();
+    
+    return errorScrollTextPanel;
+  }
+
+
+  public void addParsers() {
+    textarea.addParser(new TaskTagParser());
+    
+    // TODO: This is temporary
+    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+  }
+
+
+  // TODO: Should error strip be globally visible?
+  public JPanel getErrorBarPanel() {
+    if (es == null) {
+      es = new ErrorStrip(textarea);
+    }
+    JPanel temp = new JPanel(new BorderLayout());
+    temp.add(scrollbar);
+    temp.add(es, BorderLayout.LINE_END);
+    return temp;
   }
 
 
