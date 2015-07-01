@@ -737,7 +737,7 @@ public class ErrorCheckerService implements Runnable {
   /**
    * Calculates PDE Offsets from Java Offsets for Problems
    */
-  private void calcPDEOffsetsForProbList() {
+  protected void calcPDEOffsetsForProbList() {
     try {
       PlainDocument javaSource = new PlainDocument();
 

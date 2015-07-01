@@ -36,6 +36,7 @@ import processing.app.contrib.ToolContribution;
 import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
+import processing.mode.java.RSTA.ProcessingErrorChecker;
 import processing.mode.java.debug.LineBreakpoint;
 import processing.mode.java.debug.LineHighlight;
 import processing.mode.java.debug.LineID;
@@ -282,6 +283,7 @@ public class JavaEditor extends Editor {
 
   public void addParsers() {
     textarea.addParser(new TaskTagParser());
+    textarea.addParser(new ProcessingErrorChecker(this));
     
     // TODO: This is temporary
     textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
