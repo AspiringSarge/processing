@@ -772,10 +772,12 @@ public class ErrorCheckerService implements Runnable {
                    "Couldn't fetch Java line number " +
                    javaLineNumber + "\nProblem: " + p);
           p.setPDEOffsets(-1, -1);
+          p.setPDEStartOffsetOfLine(-1);
           continue;
         }
         int lineStart = lineElement.getStartOffset();
-        int lineLength = lineElement.getEndOffset() - lineStart;
+        int lineStop = lineElement.getEndOffset();
+        int lineLength = lineStop - lineStart;
         String javaLine = javaSource.getText(lineStart, lineLength);
 
         Document doc = pdeTabs.get(p.getTabIndex());
@@ -786,16 +788,19 @@ public class ErrorCheckerService implements Runnable {
                    "Couldn't fetch pde line number " +
                    javaLineNumber + "\nProblem: " + p);
           p.setPDEOffsets(-1,-1);
+          p.setPDEStartOffsetOfLine(-1);
           continue;
         }
         int pdeLineStart = pdeLineElement.getStartOffset();
-        int pdeLineLength = pdeLineElement.getEndOffset() - pdeLineStart;
+        int pdeLineStop = pdeLineElement.getEndOffset();
+        int pdeLineLength = pdeLineStop - pdeLineStart;
         String pdeLine =
           pdeTabs.get(p.getTabIndex()).getText(pdeLineStart, pdeLineLength);
         OffsetMatcher ofm = new OffsetMatcher(pdeLine, javaLine);
         int pdeOffset =
           ofm.getPdeOffForJavaOff(prbStart - lineStart, prbEnd - prbStart + 1);
         p.setPDEOffsets(pdeOffset, pdeOffset + prbEnd - prbStart);
+        p.setPDEStartOffsetOfLine(pdeLineStart);
       }
     } catch (BadLocationException ble) {
       ble.printStackTrace();

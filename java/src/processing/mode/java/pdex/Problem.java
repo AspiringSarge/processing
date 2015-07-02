@@ -47,9 +47,22 @@ public class Problem {
    * Line number(pde code) of the error
    */
   private int lineNumber;
+
+  /**
+   * Represents the offset of the start of the line
+   */
+  private int startOffsetOfLine;
   
+  /**
+   * Represents the offset of the start of the error
+   * with respect to the start of the line
+   */
   private int lineStartOffset;
-  
+
+  /**
+   * Represents the offset of the end of the error
+   * with respect to the start of the line
+   */
   private int lineStopOffset;
 
   /**
@@ -95,12 +108,20 @@ public class Problem {
     lineStopOffset = stopOffset;
   }
   
+  public void setPDEStartOffsetOfLine(int startOffset){
+    this.startOffsetOfLine = startOffset;
+  }
+
   public int getPDELineStartOffset(){
     return lineStartOffset;
   }
   
   public int getPDELineStopOffset(){
     return lineStopOffset;
+  }
+
+  public int getPDEStartOffset(){
+    return startOffsetOfLine;
   }
 
   public String toString() {

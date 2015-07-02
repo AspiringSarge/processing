@@ -1,13 +1,8 @@
 package processing.mode.java.RSTA;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.PlainDocument;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
@@ -17,11 +12,9 @@ import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.Parser;
 
 import processing.app.Base;
-import processing.app.SketchCode;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
 import processing.mode.java.pdex.ErrorCheckerService;
-import processing.mode.java.pdex.OffsetMatcher;
 import processing.mode.java.pdex.Problem;
 
 
@@ -68,12 +61,23 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
       result.addNotice(new DefaultParserNotice(this,
                                                p.getMessage(), 
                                                p.getLineNumber(), 
-                                               p.getPDELineStartOffset(), 
-                                               p.getPDELineStopOffset()-
-                                                 p.getPDELineStartOffset()));
-      System.out.println("Msg: " + p.getMessage() + " Line: " + p.getLineNumber()  + " Start:" +
-                         p.getPDELineStartOffset() + " Len:" + (p.getPDELineStopOffset()-
-                         p.getPDELineStartOffset()));
+                                               p.getPDEStartOffset() +
+                                                 p.getPDELineStartOffset(), 
+                                                 p.getPDELineStopOffset() -
+                                                 p.getPDELineStartOffset() +
+                                                 1));
+      /*
+      System.out.println("Msg: " + p.getMessage() + " Line: " + p.getLineNumber()  + 
+                         " Start:" + (p.getPDEStartOffset() +
+                         p.getPDELineStartOffset()) + " Len:" + 
+                         (p.getPDEStartOffset() + 
+                            p.getPDELineStopOffset() -
+                            p.getPDELineStartOffset()));
+      System.out.println("Start Offset:" + p.getPDEStartOffset() +
+                         "\nLine start offset:" + p.getPDELineStartOffset() +  
+                         "\nStop Offset:" + p.getPDEStopOffset() +
+                         "\nLine stop offset:" + p.getPDELineStopOffset());
+                         */
     }
     return result;
   }
