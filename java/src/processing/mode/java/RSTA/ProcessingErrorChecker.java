@@ -23,9 +23,11 @@ import processing.mode.java.pdex.Problem;
 public class ProcessingErrorChecker extends ErrorCheckerService implements Parser{
   
   private DefaultParseResult result;
+  private Boolean onlyRepaint;
 
   public ProcessingErrorChecker(JavaEditor debugEditor) {
     super(debugEditor);
+    onlyRepaint = false;
     result = new DefaultParseResult(this);
   }
 
@@ -55,9 +57,15 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
     Element root = doc.getDefaultRootElement();
     int lineCount = root.getElementCount();
     result.setParsedLines(0, lineCount-1);
-    checkCode();    
-    // TODO: Something likely needs to be done in there:
-    checkForMissingImports();
+    
+    if (onlyRepaint) {
+      updateEditorStatus();
+    }
+    else {
+      checkCode();    
+      // TODO: Something likely needs to be done in there:
+      checkForMissingImports();
+    }
     System.out.println("Parsed");
     for (Problem p: problemsList) {
       if (p.getTabIndex() == editor.getSketch().getCurrentCodeIndex()) {
@@ -85,6 +93,18 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
                          */
     }
     return result;
+  }
+  
+  /**
+   * Convenience method to refresh things- the status notification, the
+   * squiggles, the error tabs. 
+   */
+  public void redraw() {
+    synchronized(onlyRepaint) {
+      onlyRepaint = true;
+      editor.getTextArea().forceReparsing(this);
+      onlyRepaint = false;
+    }
   }
   
   // TODO: Should this maybe use the RSyntaxDocument instead?
@@ -127,6 +147,28 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
   @Override
   public void updateEditorStatus() {
     if (editor.getStatusMode() == EditorStatus.EDIT) return;
+    
+    if (isEnabled()) {
+      synchronized (problemsList) {
+        for (Problem problem : problemsList) {
+          if (problem.getLineNumber() == editor.getTextArea().getCaretLine() &&
+              problem.getTabIndex() == editor.getSketch().getCurrentCodeIndex()) {
+            /* TODO:
+            if (emarker.getType() == ErrorMarker.Warning) {
+              editor.statusMessage(emarker.getProblem().getMessage(),
+                                   JavaEditor.STATUS_INFO);
+            } else {
+              editor.statusMessage(emarker.getProblem().getMessage(),
+                                   JavaEditor.STATUS_COMPILER_ERR);
+            }
+            */
+            editor.statusMessage(problem.getMessage(),
+                                 JavaEditor.STATUS_COMPILER_ERR);
+            return;
+          }
+        }
+      }
+    }
 
     // This line isn't an error line anymore, so probably just clear it
     if (editor.statusMessageType == JavaEditor.STATUS_COMPILER_ERR) {

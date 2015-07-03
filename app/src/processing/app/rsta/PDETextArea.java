@@ -7,12 +7,15 @@ import java.awt.Graphics2D;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
 import javax.swing.JPopupMenu;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
 
@@ -475,7 +478,7 @@ public class PDETextArea extends RSyntaxTextArea {
 //    textArea.recalculateVisibleLines();
   }
   
-  // tODO: Look at commented out lines
+  // TODO: Look at commented out lines
   public Printable getPrintable() {
     return new Printable() {
       

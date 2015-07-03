@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.border.*;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.table.TableModel;
@@ -133,6 +135,35 @@ public class JavaEditor extends Editor {
     //          }
     //        });
     textarea.getRightClickPopup().add(renameItem);
+    
+    textarea.addCaretListener(new CaretListener() {
+      
+      @Override
+      public void caretUpdate(CaretEvent e) {
+        System.out.println("Here");
+        JavaEditor.this.errorChecker.redraw();
+      }
+    });
+    textarea.addMouseListener(new MouseListener() {
+      
+      @Override
+      public void mouseReleased(MouseEvent e) {}
+      
+      @Override
+      public void mousePressed(MouseEvent e) {}
+      
+      @Override
+      public void mouseExited(MouseEvent e) {}
+      
+      @Override
+      public void mouseEntered(MouseEvent e) {}
+      
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        System.out.println("Here");
+        JavaEditor.this.textarea.forceReparsing(errorChecker);
+      }
+    });
     // set action on frame close
     //        addWindowListener(new WindowAdapter() {
     //            @Override
@@ -2641,7 +2672,7 @@ public class JavaEditor extends Editor {
    */
   public void updateErrorToggle() {
     footer.setNotification(errorTableScrollPane,
-                           JavaMode.errorCheckEnabled &&
+                           errorChecker.isEnabled() &&
                            errorChecker != null &&
                            errorChecker.hasErrors());
 //    String title = Language.text("editor.footer.errors");
