@@ -12,9 +12,11 @@ import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.Parser;
 
 import processing.app.Base;
+import processing.app.EditorStatus;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
 import processing.mode.java.pdex.ErrorCheckerService;
+import processing.mode.java.pdex.ErrorMarker;
 import processing.mode.java.pdex.Problem;
 
 
@@ -58,14 +60,17 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
     checkForMissingImports();
     System.out.println("Parsed");
     for (Problem p: problemsList) {
-      result.addNotice(new DefaultParserNotice(this,
-                                               p.getMessage(), 
-                                               p.getLineNumber(), 
-                                               p.getPDEStartOffset() +
-                                                 p.getPDELineStartOffset(), 
-                                                 p.getPDELineStopOffset() -
-                                                 p.getPDELineStartOffset() +
-                                                 1));
+      if (p.getTabIndex() == editor.getSketch().getCurrentCodeIndex()) {
+        result.addNotice(
+          new DefaultParserNotice(this,
+                                  p.getMessage(),
+                                  p.getLineNumber(),
+                                  p.getPDEStartOffset() +
+                                    p.getPDELineStartOffset(),
+                                  p.getPDELineStopOffset() -
+                                    p.getPDELineStartOffset() +
+                                    1));
+      }
       /*
       System.out.println("Msg: " + p.getMessage() + " Line: " + p.getLineNumber()  + 
                          " Start:" + (p.getPDEStartOffset() +
@@ -107,7 +112,6 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
       calcPDEOffsetsForProbList();
       updateErrorTable();
       
-      // TODO: I'm sure there's fixing needed in this method:
       updateEditorStatus();
       
       editor.updateErrorToggle();
@@ -118,5 +122,16 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
       e.printStackTrace();
     }
     return false;
+  }
+
+  @Override
+  public void updateEditorStatus() {
+    if (editor.getStatusMode() == EditorStatus.EDIT) return;
+
+    // This line isn't an error line anymore, so probably just clear it
+    if (editor.statusMessageType == JavaEditor.STATUS_COMPILER_ERR) {
+      editor.statusEmpty();
+      return;
+    }
   }
 }

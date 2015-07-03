@@ -87,6 +87,7 @@ public class JavaEditor extends Editor {
 
   private ErrorStrip es;
   private ErrorColumn errorBar;
+  private ProcessingErrorChecker errorChecker;
 
 //  protected XQConsoleToggle btnShowConsole;
 //  protected XQConsoleToggle btnShowErrors;
@@ -159,8 +160,11 @@ public class JavaEditor extends Editor {
     hasJavaTabs = checkForJavaTabs();
     //initializeErrorChecker();
 
+    /*
+    No longer needed, since this is now run via RSTA's parser
     errorCheckerService = new ErrorCheckerService(this);
     new Thread(errorCheckerService).start();
+    */
 
     // Hack to add in error bar
     Box box = (Box) scrollbar.getParent();
@@ -283,7 +287,9 @@ public class JavaEditor extends Editor {
 
   public void addParsers() {
     textarea.addParser(new TaskTagParser());
-    textarea.addParser(new ProcessingErrorChecker(this));
+    
+    errorChecker = new ProcessingErrorChecker(this);
+    textarea.addParser(errorChecker);
     
     // TODO: This is temporary
     textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
@@ -2636,7 +2642,8 @@ public class JavaEditor extends Editor {
   public void updateErrorToggle() {
     footer.setNotification(errorTableScrollPane,
                            JavaMode.errorCheckEnabled &&
-                           errorCheckerService.hasErrors());
+                           errorChecker != null &&
+                           errorChecker.hasErrors());
 //    String title = Language.text("editor.footer.errors");
 //    if (JavaMode.errorCheckEnabled && errorCheckerService.hasErrors()) {
 //      title += "*";
