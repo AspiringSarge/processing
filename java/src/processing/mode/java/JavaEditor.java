@@ -1960,7 +1960,7 @@ public class JavaEditor extends Editor {
 
 
   public ErrorCheckerService getErrorChecker() {
-    return errorCheckerService;
+    return errorChecker;
   }
 
 
