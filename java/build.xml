@@ -115,6 +115,8 @@
                       mode/classpath-explorer-1.0.jar; 
                       mode/jsoup-1.7.1.jar;
                       mode/org.netbeans.swing.outline.jar; 
+                      mode/autocomplete-2.5.7.jar;
+                      mode/language_support.jar;
 
                       mode/jdi.jar; 
                       mode/jdimodel.jar; 

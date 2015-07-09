@@ -22,8 +22,12 @@ import javax.swing.table.TableModel;
 import javax.swing.text.Document;
 
 import org.eclipse.jdt.core.compiler.IProblem;
+import org.fife.rsta.ac.LanguageSupport;
+import org.fife.rsta.ac.LanguageSupportFactory;
+import org.fife.rsta.ac.java.JavaLanguageSupport;
 import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.parser.TaskTagParser;
 
 import processing.core.PApplet;
@@ -38,7 +42,6 @@ import processing.app.contrib.ToolContribution;
 import processing.app.rsta.PDETextArea;
 import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
-import processing.mode.java.RSTA.ProcessingErrorChecker;
 import processing.mode.java.debug.LineBreakpoint;
 import processing.mode.java.debug.LineHighlight;
 import processing.mode.java.debug.LineID;
@@ -48,6 +51,7 @@ import processing.mode.java.pdex.ErrorMessageSimplifier;
 import processing.mode.java.pdex.JavaTextArea;
 import processing.mode.java.pdex.Problem;
 import processing.mode.java.pdex.XQErrorTable;
+import processing.mode.java.rsta.ProcessingErrorChecker;
 import processing.mode.java.runner.Runner;
 import processing.mode.java.tweak.ColorControlBox;
 import processing.mode.java.tweak.Handle;
@@ -164,6 +168,7 @@ public class JavaEditor extends Editor {
         JavaEditor.this.textarea.forceReparsing(errorChecker);
       }
     });
+
     // set action on frame close
     //        addWindowListener(new WindowAdapter() {
     //            @Override
@@ -215,9 +220,29 @@ public class JavaEditor extends Editor {
 
       public void windowGainedFocus(WindowEvent e) { }
     });
-    
+
+    handleAutocompletionInit();
   }
 
+  
+  protected void handleAutocompletionInit() {
+    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+    LanguageSupportFactory lsf = LanguageSupportFactory.get();
+    LanguageSupport support = lsf.getSupportFor(SyntaxConstants.SYNTAX_STYLE_JAVA);
+    JavaLanguageSupport jls = (JavaLanguageSupport)support;
+    try {
+      File f = Base.getContentFile("core/library/core.jar");
+      if (f.exists()) {
+        // TODO: Not sure why this is needed
+        jls.getJarManager().clearClassFileSources();
+        
+        jls.getJarManager().addClassFileSource(f);//addCurrentJreClassFileSource();
+      }
+    } catch (IOException ioe) {
+       ioe.printStackTrace();
+    }
+    lsf.register(textarea);
+  }
 
   protected PDETextArea createTextArea() {
     return new JavaTextArea(new PdeTextAreaDefaults(mode), this);
@@ -323,7 +348,7 @@ public class JavaEditor extends Editor {
     textarea.addParser(errorChecker);
     
     // TODO: This is temporary
-    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+//    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
   }
 
 

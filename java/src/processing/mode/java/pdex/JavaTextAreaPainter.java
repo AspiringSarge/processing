@@ -121,11 +121,13 @@ public class JavaTextAreaPainter extends TextAreaPainter
         long thisTime = event.getWhen();
         if (thisTime - lastTime > 100) {
           if (event.getX() < Editor.LEFT_GUTTER) {
+            /* TODO:
             int offset = getTextArea().xyToOffset(event.getX(), event.getY());
             if (offset >= 0) {
               int lineIndex = getTextArea().getLineOfOffset(offset);
               getEditor().toggleBreakpoint(lineIndex);
             }
+            */
           }
           lastTime = thisTime;
         }
@@ -152,6 +154,8 @@ public class JavaTextAreaPainter extends TextAreaPainter
 
 
   void handleCtrlClick(MouseEvent evt) {
+    /*
+    A HUGE TODO:
     Base.log("--handleCtrlClick--");
     int off = textArea.xyToOffset(evt.getX(), evt.getY());
     if (off < 0)
@@ -210,6 +214,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
       Base.log(getEditor().getErrorChecker().mainClassOffset + line + "|" + line + "| offset " + xLS + word + " <= \n");
       getEditor().getErrorChecker().getASTGenerator().scrollToDeclaration(line, word, xLS);
     }
+    */
   }
 
 
@@ -263,6 +268,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
    */
   protected void paintLeftGutter(Graphics gfx, int line, int x) {
 //    gfx.setColor(Color.ORANGE);
+    /* TODO:
     int y = textArea.lineToY(line) + fm.getLeading() + fm.getMaxDescent();
     if (line == textArea.getSelectionStopLine()) {
       gfx.setColor(gutterLineHighlightColor);
@@ -290,6 +296,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
     int ty = textArea.lineToY(line) + fm.getHeight();
     Utilities.drawTabbedText(new Segment(txt, 0, text.length()),
                              tx, ty, gfx, this, 0);
+                             */
   }
 
 
@@ -388,8 +395,10 @@ public class JavaTextAreaPainter extends TextAreaPainter
    * @param x
    */
   protected void paintLineBgColor(Graphics gfx, int line, int x) {
+    /* TODO:
     int y = textArea.lineToY(line);
     y += fm.getLeading() + fm.getMaxDescent();
+    */
     int height = fm.getHeight();
 
     // get the color
@@ -402,7 +411,8 @@ public class JavaTextAreaPainter extends TextAreaPainter
     }
     // paint line background
     gfx.setColor(col);
-    gfx.fillRect(0, y, getWidth(), height);
+//    TODO:
+//    gfx.fillRect(0, y, getWidth(), height);
   }
 
 
@@ -448,8 +458,9 @@ public class JavaTextAreaPainter extends TextAreaPainter
     // Determine co-ordinates
     // log("Hoff " + ta.getHorizontalOffset() + ", " +
     // horizontalAdjustment);
+    /* TODO:
     int y = textArea.lineToY(line);
-    y += fm.getLeading() + fm.getMaxDescent();
+    y += fm.getLeading() + fm.getMaxDescent();*/
 //    int height = fm.getHeight();
     int start = textArea.getLineStartOffset(line) + problem.getPDELineStartOffset();
     int pLength = problem.getPDELineStopOffset() + 1 - problem.getPDELineStartOffset();
@@ -457,6 +468,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
     try {
       String badCode = null;
       String goodCode = null;
+      /* TODO:
       try {
         SyntaxDocument doc = textArea.getDocument();
         badCode = doc.getText(start, pLength);
@@ -470,12 +482,14 @@ public class JavaTextAreaPainter extends TextAreaPainter
         // log((ta.getLineStopOffset(line) - start - 1));
         return;
       }
+        */
 
       // Take care of offsets
       int aw = fm.stringWidth(trimRight(badCode)) + textArea.getHorizontalOffset(); // apparent width. Whitespaces
       // to the left of line + text
       // width
       int rw = fm.stringWidth(badCode.trim()); // real width
+      /* TODO:
       int x1 = fm.stringWidth(goodCode) + (aw - rw), y1 = y + fm.getHeight()
           - 2, x2 = x1 + rw;
       // Adding offsets for the gutter
@@ -483,7 +497,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
       x2 += Editor.LEFT_GUTTER;
 
       errorLineCoords.add(new ErrorLineCoord(x1,  x2, y, y1, problem));
-
+      */
       // gfx.fillRect(x1, y, rw, height);
 
       // Let the painting begin!
@@ -499,6 +513,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
       if (isWarning) {
         gfx.setColor(warningColor);
       }
+      /* TODO:
       int xx = x1;
 
       // Draw the jagged lines
@@ -508,6 +523,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
         gfx.drawLine(xx, y1 + 1, xx + 2, y1);
         xx += 2;
       }
+    */
     } catch (Exception e) {
       System.out
           .println("Looks like I messed up! XQTextAreaPainter.paintLine() : "
@@ -562,6 +578,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
 
   @Override
   public String getToolTipText(MouseEvent event) {
+    /* TODO:
     if (!getEditor().hasJavaTabs()) {
       int off = textArea.xyToOffset(event.getX(), event.getY());
       if (off < 0) {
@@ -644,6 +661,8 @@ public class JavaTextAreaPainter extends TextAreaPainter
     // Used when there are Java tabs, but also the fall-through case from above
 //    setToolTipText(null);
     return super.getToolTipText(event);
+    */
+    return  null;
   }
 
 
@@ -679,6 +698,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
                 				RenderingHints.VALUE_ANTIALIAS_ON);
 
 			for (Handle n : handles.get(currentTab)) {
+			  /* TODO:
 				// update n position and width, and draw it
 				int lineStartChar = textArea.getLineStartOffset(n.line);
 				int x = textArea.offsetToX(n.line, n.newStartChar - lineStartChar);
@@ -687,15 +707,18 @@ public class JavaTextAreaPainter extends TextAreaPainter
 				n.setPos(x, y);
 				n.setWidth(end - x);
 				n.draw(g2d, n==mouseHandle);
+				*/
 			}
 
 			// draw color boxes
 			for (ColorControlBox cBox: colorBoxes.get(currentTab)) {
+			  /* TODO:
 				int lineStartChar = textArea.getLineStartOffset(cBox.getLine());
 				int x = textArea.offsetToX(cBox.getLine(), cBox.getCharIndex() - lineStartChar);
 				int y = textArea.lineToY(cBox.getLine()) + fm.getDescent();
 				cBox.setPos(x, y+1);
 				cBox.draw(g2d);
+				*/
 			}
 		}
 	}
@@ -741,6 +764,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
 	* (don't paint while we make changes to the text of the editor)
 	*/
 	private synchronized void initInterfacePositions() {
+	  /* TODO:
 		SketchCode[] code = getEditor().getSketch().getCode();
 		int prevScroll = textArea.getVerticalScrollPosition();
 		String prevText = textArea.getText();
@@ -766,6 +790,7 @@ public class JavaTextAreaPainter extends TextAreaPainter
 
 		textArea.setText(prevText);
 		textArea.scrollTo(prevScroll, 0);
+		*/
 	}
 
 
@@ -799,10 +824,12 @@ public class JavaTextAreaPainter extends TextAreaPainter
 	private synchronized void replaceTextAreaCode(String code) {
 	  // by default setText will scroll all the way to the end
 	  // remember current scroll position
+	  /* TODO:
 	  int scrollLine = textArea.getVerticalScrollPosition();
 	  int scrollHor = textArea.getHorizontalScrollPosition();
 	  textArea.setText(code);
 	  textArea.setOrigin(scrollLine, -scrollHor);
+	  */
 	}
 
 

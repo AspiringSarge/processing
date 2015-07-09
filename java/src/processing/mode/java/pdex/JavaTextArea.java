@@ -231,7 +231,9 @@ public class JavaTextArea extends PDETextArea {
   /**
    * Handles KeyEvents for TextArea (code completion begins from here).
    */
+  /*TODO: RSTA- I don't think we need this any more
   public void processKeyEvent(KeyEvent evt) {
+    System.out.println("Hereito");
     if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
       if (suggestion != null){
         if (suggestion.isVisible()){
@@ -301,7 +303,7 @@ public class JavaTextArea extends PDETextArea {
         processControlSpace(evt);
       }
     }
-  }
+  }*/
 
 
   // Special case for OS X, where Ctrl-Space is not detected as KEY_TYPED

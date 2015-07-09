@@ -182,7 +182,7 @@ public class JEditTextArea extends JComponent
    * @return a newly constructed {@link TextAreaPainter}.
    */
   protected TextAreaPainter createPainter(final TextAreaDefaults defaults) {
-    return new TextAreaPainter(this, defaults);
+    return null;//new TextAreaPainter(this, defaults);
   }
 
 

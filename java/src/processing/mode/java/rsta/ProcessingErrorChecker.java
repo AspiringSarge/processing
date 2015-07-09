@@ -1,4 +1,4 @@
-package processing.mode.java.RSTA;
+package processing.mode.java.rsta;
 
 import java.net.URL;
 
