@@ -1,5 +1,6 @@
 package processing.mode.java.rsta;
 
+import java.awt.Color;
 import java.net.URL;
 
 import javax.swing.text.Element;
@@ -10,9 +11,12 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ExtendedHyperlinkListener;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.Parser;
+import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
+import org.fife.ui.rsyntaxtextarea.parser.TaskTagParser.TaskNotice;
 
 import processing.app.Base;
 import processing.app.EditorStatus;
+import processing.app.Mode;
 import processing.mode.java.JavaEditor;
 import processing.mode.java.JavaMode;
 import processing.mode.java.pdex.ErrorCheckerService;
@@ -21,14 +25,21 @@ import processing.mode.java.pdex.Problem;
 
 
 public class ProcessingErrorChecker extends ErrorCheckerService implements Parser{
-  
+
   private DefaultParseResult result;
   private Boolean onlyRepaint;
+
+  private Color warningColor;
+  private Color errorColor;
 
   public ProcessingErrorChecker(JavaEditor debugEditor) {
     super(debugEditor);
     onlyRepaint = false;
     result = new DefaultParseResult(this);
+    
+    Mode mode = debugEditor.getMode();
+    errorColor = mode.getColor("errorbar.errorcolor");
+    warningColor = mode.getColor("errorbar.warningcolor");
   }
 
   @Override
@@ -69,15 +80,24 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
     System.out.println("Parsed");
     for (Problem p: problemsList) {
       if (p.getTabIndex() == editor.getSketch().getCurrentCodeIndex()) {
-        result.addNotice(
-          new DefaultParserNotice(this,
-                                  p.getMessage(),
-                                  p.getLineNumber(),
-                                  p.getPDEStartOffset() +
-                                    p.getPDELineStartOffset(),
-                                  p.getPDELineStopOffset() -
-                                    p.getPDELineStartOffset() +
-                                    1));
+        DefaultParserNotice pn = 
+            new DefaultParserNotice(this,
+                                    p.getMessage(),
+                                    p.getLineNumber(),
+                                    p.getPDEStartOffset() +
+                                      p.getPDELineStartOffset(),
+                                    p.getPDELineStopOffset() -
+                                      p.getPDELineStartOffset() +
+                                      1);
+        if (p.isError()) {
+          pn.setLevel(ParserNotice.Level.ERROR);
+          pn.setColor(errorColor);
+        }
+        else if (p.isWarning()) {
+          pn.setLevel(ParserNotice.Level.WARNING);
+          pn.setColor(warningColor);
+        }
+        result.addNotice(pn);
       }
       /*
       System.out.println("Msg: " + p.getMessage() + " Line: " + p.getLineNumber()  + 
@@ -162,8 +182,14 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
                                    JavaEditor.STATUS_COMPILER_ERR);
             }
             */
-            editor.statusMessage(problem.getMessage(),
-                                 JavaEditor.STATUS_COMPILER_ERR);
+            if (problem.isError()) {
+              editor.statusMessage(problem.getMessage(),
+                                   JavaEditor.STATUS_COMPILER_ERR);
+            }
+            else if (problem.isWarning()) {
+              editor.statusMessage(problem.getMessage(),
+                                   JavaEditor.STATUS_INFO);
+            }
             return;
           }
         }
