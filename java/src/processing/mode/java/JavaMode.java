@@ -121,7 +121,7 @@ public class JavaMode extends Mode {
   public Runner handleRun(Sketch sketch,
                           RunnerListener listener) throws SketchException {
     final JavaEditor editor = (JavaEditor)listener;
-    editor.errorCheckerService.quickErrorCheck();
+    editor.errorChecker.redraw();
     if (enableTweak) {
       enableTweak = false;
       return handleTweak(sketch, listener, false);
@@ -134,7 +134,7 @@ public class JavaMode extends Mode {
   public Runner handlePresent(Sketch sketch,
                               RunnerListener listener) throws SketchException {
     final JavaEditor editor = (JavaEditor)listener;
-    editor.errorCheckerService.quickErrorCheck();
+    editor.errorChecker.redraw();
     if (enableTweak) {
       enableTweak = false;
       return handleTweak(sketch, listener, true);

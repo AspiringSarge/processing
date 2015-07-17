@@ -93,7 +93,7 @@ public class JavaEditor extends Editor {
 
   private ErrorStrip es;
   private ErrorColumn errorBar;
-  private ProcessingErrorChecker errorChecker;
+  protected ProcessingErrorChecker errorChecker;
 
 //  protected XQConsoleToggle btnShowConsole;
 //  protected XQConsoleToggle btnShowErrors;
@@ -105,8 +105,8 @@ public class JavaEditor extends Editor {
   private boolean hasJavaTabs;
   private boolean javaTabWarned;
 
-  protected ErrorCheckerService errorCheckerService;
-
+//  Replaced by errorChecker:
+//  protected ErrorCheckerService errorCheckerService;
 
   protected JavaEditor(Base base, String path, EditorState state, Mode mode) {
     super(base, path, state, mode);
@@ -146,26 +146,6 @@ public class JavaEditor extends Editor {
       public void caretUpdate(CaretEvent e) {
         System.out.println("Here");
         JavaEditor.this.errorChecker.redraw();
-      }
-    });
-    textarea.addMouseListener(new MouseListener() {
-      
-      @Override
-      public void mouseReleased(MouseEvent e) {}
-      
-      @Override
-      public void mousePressed(MouseEvent e) {}
-      
-      @Override
-      public void mouseExited(MouseEvent e) {}
-      
-      @Override
-      public void mouseEntered(MouseEvent e) {}
-      
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        System.out.println("Here");
-        JavaEditor.this.textarea.forceReparsing(errorChecker);
       }
     });
 
@@ -356,6 +336,9 @@ public class JavaEditor extends Editor {
   public JPanel getErrorBarPanel() {
     if (es == null) {
       es = new ErrorStrip(textarea);
+//      TODO:
+//      es.setBackground(mode.getColor("gutter.bgcolor"));
+//      es.setOpaque(true);
     }
     JPanel temp = new JPanel(new BorderLayout());
     temp.add(scrollbar);
@@ -1421,7 +1404,8 @@ public class JavaEditor extends Editor {
     if (inspector != null) {
       inspector.dispose();
     }
-    errorCheckerService.stopThread();
+//    No longer needed
+//    errorCheckerService.stopThread();
     super.dispose();
   }
 
@@ -1431,7 +1415,7 @@ public class JavaEditor extends Editor {
    * For analytics purposes only.
    */
   private void writeErrorsToFile() {
-    if (errorCheckerService.tempErrorLog.size() == 0) return;
+    if (errorChecker.tempErrorLog.size() == 0) return;
 
     try {
       System.out.println("Writing errors");
@@ -1441,8 +1425,8 @@ public class JavaEditor extends Editor {
                 + "\nComma in error msg is substituted with ^ symbol\nFor separating arguments in error args | symbol is used\n");
       sb.append("ERROR TYPE, ERROR ARGS, ERROR MSG\n");
 
-      for (String errMsg : errorCheckerService.tempErrorLog.keySet()) {
-        IProblem ip = errorCheckerService.tempErrorLog.get(errMsg);
+      for (String errMsg : errorChecker.tempErrorLog.keySet()) {
+        IProblem ip = errorChecker.tempErrorLog.get(errMsg);
         if (ip != null) {
           sb.append(ErrorMessageSimplifier.getIDName(ip.getID()));
           sb.append(',');
@@ -2038,7 +2022,7 @@ public class JavaEditor extends Editor {
    * them.
    */
   protected void downloadImports() {
-    String importRegex = errorCheckerService.importRegexp;
+    String importRegex = errorChecker.importRegexp;
     String tabCode;
     for (SketchCode sc : sketch.getCode()) {
       if (sc.isExtension("pde")) {
@@ -2714,14 +2698,14 @@ public class JavaEditor extends Editor {
   /** Handle refactor operation */
   private void handleRefactor() {
     Base.log("Caret at:" + textarea.getLineText(textarea.getCaretLine()));
-    errorCheckerService.getASTGenerator().handleRefactor();
+    errorChecker.getASTGenerator().handleRefactor();
   }
 
 
   /** Handle show usage operation */
   private void handleShowUsage() {
     Base.log("Caret at:" + textarea.getLineText(textarea.getCaretLine()));
-    errorCheckerService.getASTGenerator().handleShowUsage();
+    errorChecker.getASTGenerator().handleShowUsage();
   }
 
 
@@ -2758,7 +2742,7 @@ public class JavaEditor extends Editor {
       jmode.loadPreferences();
       Base.log("Applying prefs");
       // trigger it once to refresh UI
-      errorCheckerService.runManualErrorCheck();
+      errorChecker.redraw();
     }
   }
 

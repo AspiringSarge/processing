@@ -77,7 +77,6 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
       // TODO: Something likely needs to be done in there:
       checkForMissingImports();
     }
-    System.out.println("Parsed");
     for (Problem p: problemsList) {
       if (p.getTabIndex() == editor.getSketch().getCurrentCodeIndex()) {
         DefaultParserNotice pn = 

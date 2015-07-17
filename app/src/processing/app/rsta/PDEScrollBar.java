@@ -32,6 +32,7 @@ public class PDEScrollBar extends RTextScrollPane {
    * @param offset The offset in the line to scroll to
    * @return True if scrolling was actually performed, false if the
    * line and offset was already visible
+   * @deprecated
    */
   public boolean scrollTo(int line, int offset) {
     return false;

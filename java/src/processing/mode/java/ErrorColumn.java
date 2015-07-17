@@ -52,7 +52,7 @@ import processing.app.Language;
  * which displays the overall errors in a document
  *
  * @author Manindra Moharana &lt;me@mkmoharana.com&gt;
- *
+ * @deprecated Now replaced by RSTA's ErrorStrip
  */
 public class ErrorColumn extends JPanel {
 	/**
@@ -136,7 +136,7 @@ public class ErrorColumn extends JPanel {
 	public ErrorColumn(JavaEditor editor, int height, JavaMode mode) {
 		this.editor = editor;
 		this.preferredHeight = height;
-		this.errorCheckerService = editor.errorCheckerService;
+		this.errorCheckerService = editor.errorChecker;
 
 		errorColor = mode.getColor("errorbar.errorcolor"); //, errorColor);
 		warningColor = mode.getColor("errorbar.warningcolor"); //, warningColor);
