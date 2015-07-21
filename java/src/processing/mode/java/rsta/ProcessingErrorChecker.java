@@ -67,7 +67,7 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
     result.clearNotices();
     Element root = doc.getDefaultRootElement();
     int lineCount = root.getElementCount();
-    result.setParsedLines(0, lineCount-1);
+    result.setParsedLines(1, lineCount);
     
     if (onlyRepaint) {
       updateEditorStatus();
@@ -82,7 +82,7 @@ public class ProcessingErrorChecker extends ErrorCheckerService implements Parse
         DefaultParserNotice pn = 
             new DefaultParserNotice(this,
                                     p.getMessage(),
-                                    p.getLineNumber(),
+                                    p.getLineNumber()+1,
                                     p.getPDEStartOffset() +
                                       p.getPDELineStartOffset(),
                                     p.getPDELineStopOffset() -
