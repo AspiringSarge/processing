@@ -59,6 +59,12 @@
 	<include name="icon/*.png" />
       </fileset>
     </copy>
+
+    <copy todir="bin/src">
+      <fileset dir="src">
+        <include name="processing/**"/>
+        </fileset>
+      </copy>
   </target>		
 
   <target name="build" depends="compile" description="Build core library">

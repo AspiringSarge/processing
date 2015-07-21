@@ -7,25 +7,21 @@ import java.awt.Graphics2D;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
 import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
 
+import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 
 import processing.app.Preferences;
 import processing.app.syntax.HtmlSelection;
-import processing.app.syntax.PdeTextAreaDefaults;
-import processing.app.syntax.SyntaxDocument;
 import processing.app.syntax.TextAreaDefaults;
 import processing.app.syntax.TokenMarker;
 

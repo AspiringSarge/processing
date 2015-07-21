@@ -25,9 +25,10 @@ import org.eclipse.jdt.core.compiler.IProblem;
 import org.fife.rsta.ac.LanguageSupport;
 import org.fife.rsta.ac.LanguageSupportFactory;
 import org.fife.rsta.ac.java.JavaLanguageSupport;
+import org.fife.rsta.ac.java.buildpath.JarLibraryInfo;
+import org.fife.rsta.ac.java.buildpath.ZipSourceLocation;
 import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.parser.TaskTagParser;
 
 import processing.core.PApplet;
@@ -40,7 +41,6 @@ import processing.app.contrib.ContributionListing;
 import processing.app.contrib.ContributionManager;
 import processing.app.contrib.ToolContribution;
 import processing.app.rsta.PDETextArea;
-import processing.app.syntax.JEditTextArea;
 import processing.app.syntax.PdeTextAreaDefaults;
 import processing.mode.java.debug.LineBreakpoint;
 import processing.mode.java.debug.LineHighlight;
@@ -144,7 +144,7 @@ public class JavaEditor extends Editor {
       
       @Override
       public void caretUpdate(CaretEvent e) {
-        System.out.println("Here");
+        // TODO: Maybe add a small delay?
         JavaEditor.this.errorChecker.redraw();
       }
     });
@@ -201,10 +201,9 @@ public class JavaEditor extends Editor {
       public void windowGainedFocus(WindowEvent e) { }
     });
 
-    handleAutocompletionInit();
+    handleP5AutocompletionInit();
   }
 
-  
   protected void handleAutocompletionInit() {
     textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
     LanguageSupportFactory lsf = LanguageSupportFactory.get();
@@ -222,6 +221,32 @@ public class JavaEditor extends Editor {
        ioe.printStackTrace();
     }
     lsf.register(textarea);
+  }
+
+  protected void handleP5AutocompletionInit() {
+    // TODO: This is most certainly temporary
+    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
+    
+    JavaLanguageSupport jls = new JavaLanguageSupport();
+    try {
+      File f = Base.getContentFile("core/library/core.jar");
+      if (f.exists()) {
+        // TODO: Not sure why this is needed
+        jls.getJarManager().clearClassFileSources();
+        JarLibraryInfo jli = new JarLibraryInfo(f, new ZipSourceLocation(f));
+        jls.getJarManager().addClassFileSource(jli);
+        jls.getJarManager().addClassFileSource(jli);//addCurrentJreClassFileSource();
+      }
+      else {
+        System.out.println("Ouch");
+      }
+    } catch (IOException ioe) {
+       ioe.printStackTrace();
+    }
+    jls.install(textarea);
+    textarea.putClientProperty(LanguageSupportFactory.LANGUAGE_SUPPORT_PROPERTY, jls);
+    
+    // TODO: In JavaLanguageSupport class, look at all TODOs
   }
 
   protected PDETextArea createTextArea() {
