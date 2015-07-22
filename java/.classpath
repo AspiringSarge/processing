@@ -19,6 +19,8 @@
 	<classpathentry kind="lib" path="mode/org.eclipse.osgi.jar"/>
 	<classpathentry kind="lib" path="mode/org.eclipse.text.jar"/>
 	<classpathentry kind="lib" path="mode/org.netbeans.swing.outline.jar"/>
+	<classpathentry kind="lib" path="mode/autocomplete-2.5.7.jar"/>
+	<classpathentry kind="lib" path="mode/language_support.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-app"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/processing-core"/>
@@ -27,6 +29,5 @@
 			<attribute name="javadoc_location" value="http://javadoc.fifesoft.com/rsyntaxtextarea/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="mode/autocomplete-2.5.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
