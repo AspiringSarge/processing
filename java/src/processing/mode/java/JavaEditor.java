@@ -52,6 +52,7 @@ import processing.mode.java.pdex.JavaTextArea;
 import processing.mode.java.pdex.Problem;
 import processing.mode.java.pdex.XQErrorTable;
 import processing.mode.java.rsta.ProcessingErrorChecker;
+import processing.mode.java.rsta.autocomplete.PDELanguageSupport;
 import processing.mode.java.runner.Runner;
 import processing.mode.java.tweak.ColorControlBox;
 import processing.mode.java.tweak.Handle;
@@ -206,22 +207,8 @@ public class JavaEditor extends Editor {
 
   
   protected void handleAutocompletionInit() {
-    textarea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
-    LanguageSupportFactory lsf = LanguageSupportFactory.get();
-    LanguageSupport support = lsf.getSupportFor(SyntaxConstants.SYNTAX_STYLE_JAVA);
-    JavaLanguageSupport jls = (JavaLanguageSupport)support;
-    try {
-      File f = Base.getContentFile("core/library/core.jar");
-      if (f.exists()) {
-        // TODO: Not sure why this is needed
-        jls.getJarManager().clearClassFileSources();
-        
-        jls.getJarManager().addClassFileSource(f);//addCurrentJreClassFileSource();
-      }
-    } catch (IOException ioe) {
-       ioe.printStackTrace();
-    }
-    lsf.register(textarea);
+    PDELanguageSupport pdel = new PDELanguageSupport(this);
+    pdel.install(textarea);
   }
 
   protected PDETextArea createTextArea() {

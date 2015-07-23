@@ -779,6 +779,40 @@ public class ASTGenerator {
    */
   public void preparePredictions(final String word, final int line,
                                  final int lineStartNonWSOffset) {
+
+//        loadCandidates(word, line);
+//        showPredictions(word);
+//        predictionOngoing.set(false);
+//      }
+//    };
+//
+//    worker.execute();
+  }
+
+  /**
+   * The function that calculates possible code completion candidates,
+   * and return them. Used by RSyntaxTextArea's autocomplete library to fill in
+   * the auto-completion popup
+   *
+   * @param word
+   * @param line
+   * @param lineStartNonWSOffset
+   */
+  public DefaultListModel<CompletionCandidate> getPredictions(final String word,
+                                                              final int line,
+                                                              final int lineStartNonWSOffset) {
+    loadCandidates(word, line);
+    DefaultListModel<CompletionCandidate> list = new DefaultListModel<>();
+    DefaultListModel<CompletionCandidate> temp = readyPredictions();
+    for (int i=0; i<temp.getSize(); i++) {
+      list.addElement(temp.getElementAt(i));
+    }
+    predictionOngoing.set(false);
+    return list;
+  }
+
+
+  protected void loadCandidates(final String word, final int line) {
     if (predictionOngoing.get()) return;
     if (!JavaMode.codeCompletionsEnabled) return;
     if (word.length() < predictionMinLength) return;
@@ -823,7 +857,7 @@ public class ASTGenerator {
             } else {
               trimCandidates(word2);
             }
-            showPredictions(word);
+//            showPredictions(word);
             lastPredictedWord = word2;
             predictionOngoing.set(false);
             return;
@@ -1001,11 +1035,10 @@ public class ASTGenerator {
           }
         }
 
-        showPredictions(word);
+//      showPredictions(word);
         predictionOngoing.set(false);
 //      }
 //    };
-//
 //    worker.execute();
   }
 
@@ -1033,6 +1066,18 @@ public class ASTGenerator {
 //      tableAuto.repaint();
 //    }
     errorCheckerService.getEditor().getJavaTextArea().showSuggestion(defListModel, word);
+  }
+
+
+  protected DefaultListModel<CompletionCandidate> readyPredictions() {
+    DefaultListModel<CompletionCandidate> defListModel = null;
+
+    // return completions only when the outline is not visible
+    if (sketchOutline == null || !sketchOutline.isVisible()) {
+      Collections.sort(candidates);
+      defListModel = filterPredictions();
+    }
+    return defListModel;
   }
 
   private DefaultListModel<CompletionCandidate> filterPredictions(){
