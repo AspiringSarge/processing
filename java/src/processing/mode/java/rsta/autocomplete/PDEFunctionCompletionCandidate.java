@@ -9,6 +9,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Position;
 
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.FunctionCompletion;
@@ -22,13 +23,25 @@ public class PDEFunctionCompletionCandidate extends FunctionCompletion {
   private List<Parameter> params;
   CompletionCandidate cc;
 
+//TODO: Check the overridden funcitons and ensure they're returning 
+//what they're supposed to be
   public PDEFunctionCompletionCandidate(CompletionProvider provider, CompletionCandidate cc) {
     super(provider, cc.getElementName(), cc.isLocal()?((MethodDeclaration)cc.getWrappedObject()).getReturnType2().toString():((Method)cc.getWrappedObject()).getReturnType().getSimpleName());
-    Method m = (Method)cc.getWrappedObject();
     ArrayList<Parameter> p = new ArrayList<>();
-    for (java.lang.reflect.Parameter actPar : m.getParameters()) {
-//      System.out.println(actPar.getClass().getSimpleName() + actPar.getName() + actPar.getParameterizedType().getClass().getSimpleName() + actPar.getAnnotatedType());
-      p.add(new Parameter(actPar.getType().getSimpleName(), actPar.getName()));
+    if (cc.isLocal()) {
+      MethodDeclaration m = (MethodDeclaration)cc.getWrappedObject();
+      List<SingleVariableDeclaration> l = m.parameters();
+      for (SingleVariableDeclaration par : l) {
+  //      System.out.println(actPar.getClass().getSimpleName() + actPar.getName() + actPar.getParameterizedType().getClass().getSimpleName() + actPar.getAnnotatedType());
+        p.add(new Parameter(par.getType().toString(), par.getName().toString()));
+      }
+    }
+    else {
+      Method m = (Method)cc.getWrappedObject();
+      for (java.lang.reflect.Parameter actPar : m.getParameters()) {
+  //      System.out.println(actPar.getClass().getSimpleName() + actPar.getName() + actPar.getParameterizedType().getClass().getSimpleName() + actPar.getAnnotatedType());
+        p.add(new Parameter(actPar.getType().getSimpleName(), actPar.getName()));
+      }
     }
     this.setParams(p);
     this.summary = null;

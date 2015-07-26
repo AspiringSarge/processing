@@ -296,6 +296,10 @@ public class CompletionCandidate implements Comparable<CompletionCandidate>{
     return type == LOCAL_FIELD || type == PREDEF_FIELD;
   }
   
+  public boolean isVar() {
+    return type == LOCAL_VAR;
+  }
+  
   public boolean isPredefined() {
     return type == PREDEF_CLASS || type == PREDEF_FIELD || type == PREDEF_METHOD;
   }

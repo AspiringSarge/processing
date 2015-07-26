@@ -17,19 +17,23 @@ import org.fife.ui.autocomplete.VariableCompletion;
 
 import processing.mode.java.pdex.CompletionCandidate;
 
+//TODO: Check the overridden funcitons and ensure they're returning 
+//what they're supposed to be
 public class PDEOverloadedFunctionCompletionCandidate extends VariableCompletion {
 
   private String summary;
 //  private List<Parameter> params;
   CompletionCandidate cc;
+  private String type;
 
   public PDEOverloadedFunctionCompletionCandidate(CompletionProvider provider, CompletionCandidate cc) {
     super(provider, cc.getElementName(), cc.isLocal()?((MethodDeclaration)cc.getWrappedObject()).getReturnType2().toString():((Method)cc.getWrappedObject()).getReturnType().getSimpleName());
-    Method m = (Method)cc.getWrappedObject();
-    ArrayList<Parameter> p = new ArrayList<>();
-    for (java.lang.reflect.Parameter actPar : m.getParameters()) {
-      p.add(new Parameter(actPar.getClass().getSimpleName(), actPar.getName()));
-    }
+    // TODO: Add in return type variable?
+//    Method m = (Method)cc.getWrappedObject();
+//    ArrayList<Parameter> p = new ArrayList<>();
+//    for (java.lang.reflect.Parameter actPar : m.getParameters()) {
+//      p.add(new Parameter(actPar.getClass().getSimpleName(), actPar.getName()));
+//    }
 //    this.setParams(p);
     this.summary = null;
     this.cc = cc;
@@ -99,5 +103,10 @@ public class PDEOverloadedFunctionCompletionCandidate extends VariableCompletion
     // Shown in popup autocomplete menu
 //    System.out.println("Name: " + cc.getLabel());
     return cc.getLabel();
+  }
+  
+  @Override
+  public String getType() {
+    return super.getType();
   }
 }

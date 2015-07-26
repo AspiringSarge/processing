@@ -26,7 +26,7 @@ import org.fife.ui.autocomplete.VariableCompletion;
  * @author Joel Moniz
  * @version 1.0
  */
-// TODO: Look at JavaCellRenderer for otimizations later on
+// TODO: Look at JavaCellRenderer for optimizations later on
 class PDECellRenderer extends CompletionCellRenderer {
 
 	private Icon variableIcon;
@@ -74,9 +74,24 @@ class PDECellRenderer extends CompletionCellRenderer {
 			VariableCompletion vc, int index, boolean selected,
 			boolean hasFocus) {
 //    System.out.println("Var " + vc.getReplacementText());
-		if (vc instanceof PDEOverloadedFunctionCompletionCandidate) {
-		  setIcon(functionIcon);
-		  setText(((PDEOverloadedFunctionCompletionCandidate)vc).getShortDescription());
+		if (vc instanceof PDEOverloadedFunctionCompletionCandidate || 
+		    vc instanceof PDEVariableCompletionCandidate) {
+		  if (vc instanceof PDEOverloadedFunctionCompletionCandidate) {
+		    setIcon(functionIcon);
+		  }
+		  else {
+		    setIcon(variableIcon);
+		  }
+		  String descrip = vc.getShortDescription();
+      if (descrip != null && descrip.toLowerCase().contains("<html>")) {
+//        System.out.println("Yep: " + vc.getReplacementText());
+        setText(descrip);
+      }
+      else {
+//        System.out.println("Nope: " + vc.getReplacementText());
+        super.prepareForVariableCompletion(list, vc, index, selected,
+                                           hasFocus);
+      }
 		}
 		else {
 	    super.prepareForVariableCompletion(list, vc, index, selected,
@@ -93,15 +108,23 @@ class PDECellRenderer extends CompletionCellRenderer {
 	protected void prepareForFunctionCompletion(JList list,
 			FunctionCompletion fc, int index, boolean selected,
 			boolean hasFocus) {
-//    System.out.println("Func " + fc.getReplacementText());
     // TODO: Instead of using this which has no labeling for names of variables, 
 	  // comment this out and use things like default after giving variables their proper names in the ctor
 	  if (fc instanceof PDEFunctionCompletionCandidate) {
-	    setText(((PDEFunctionCompletionCandidate)fc).getShortDescription());
+	    String descrip = fc.getShortDescription();
+	    if (descrip.toLowerCase().contains("<html>")) {
+	      setText(descrip);
+	    }
+	    else {
+	      super.prepareForFunctionCompletion(list, fc, index, selected,
+	                                         hasFocus);
+	    }
+//	    System.out.println("FC inst Func " + fc.getReplacementText());
 	  }
 	  else {
   		super.prepareForFunctionCompletion(list, fc, index, selected,
   										hasFocus);
+//  		System.out.println("Non-FC inst Func " + fc.getReplacementText());
 	  }
 		setIcon(functionIcon);
 	}

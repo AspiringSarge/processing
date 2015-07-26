@@ -9,6 +9,8 @@ import org.fife.ui.autocomplete.CompletionProvider;
 
 import processing.mode.java.pdex.CompletionCandidate;
 
+//TODO: Check the overridden funcitons and ensure they're returning 
+//what they're supposed to be
 public class PDEBasicCompletionCandidate extends BasicCompletion {
 
   protected CompletionCandidate cc;

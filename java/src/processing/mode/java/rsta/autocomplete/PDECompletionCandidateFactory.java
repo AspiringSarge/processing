@@ -7,15 +7,10 @@ import processing.mode.java.pdex.CompletionCandidate;
 
 public class PDECompletionCandidateFactory {
   public static AbstractCompletion getCandidate(CompletionProvider provider, CompletionCandidate cc) {
-//    provider.setParameterizedCompletionParams('(', ", ", ')');
-    if (cc.isField()) {
-      return new PDEBasicCompletionCandidate(provider, cc);
+    if (cc.isField() || cc.isVar()) {
+      return new PDEVariableCompletionCandidate(provider, cc);
     }
-    else if (cc.isMethod() && cc.isPredefined()) {
-      // HACK: Done since we can't remove that bracket :(
-      // TODO: Fix this if ParameterizedCompletionInsertionInfo is made public 
-//      System.out.println("Here");
-//      provider.setParameterizedCompletionParams(' ', ", ", ')');
+    else if (cc.isMethod()) {// && cc.isPredefined()) {
       if (cc.getLabel().contains("...")) {
         return new PDEOverloadedFunctionCompletionCandidate(provider, cc);
       }

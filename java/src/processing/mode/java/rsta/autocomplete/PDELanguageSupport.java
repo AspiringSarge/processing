@@ -118,9 +118,9 @@ public class PDELanguageSupport extends AbstractLanguageSupport {
     @Override
     protected void insertCompletion(Completion c,
                                     boolean typedParamListStartChar) {
-      System.out.println(c.getReplacementText() + "  " + c.getClass().getSimpleName());
+//      System.out.println(c.getReplacementText() + "  " + c.getClass().getSimpleName());
       if (c.getReplacementText().trim().endsWith("(")) {
-        System.out.println("HERE!");
+//        System.out.println("HERE!");
         JTextComponent textComp = getTextComponent();
         String alreadyEntered = c.getAlreadyEntered(textComp);
 //        hidePopupWindow();
