@@ -90,12 +90,13 @@ public class PDECodeCompletionProvider extends DefaultCompletionProvider {
   
   @Override
   public List<ParameterizedCompletion> getParameterizedCompletions(JTextComponent tc) {
+    // TODO:
 //    String text = getAlreadyEnteredText(tc);
 //    int pdeLine = line + editor.getErrorChecker().mainClassOffset;
 //    
 //    DefaultListModel<CompletionCandidate> list = 
 //        editor.getErrorChecker().getASTGenerator().getPredictions(text, pdeLine,0);
-//    ArrayList<Completion> l = new ArrayList<>();
+//    List<Completion> l = new ArrayList<>();
 //    for (int i=0; i<list.getSize(); i++) {
 //      l.add(new PDEBasicCompletionCandidate(this, list.getElementAt(i)));
 //    }
@@ -133,6 +134,11 @@ public class PDECodeCompletionProvider extends DefaultCompletionProvider {
 //    f.setSummary(org.fife.rsta.ac.java.Util.docCommentToHtml("/**La di bla\n\n@param comp: Lah*/"));
 //    l.add(f);
     return l;
+  }
+  
+  @Override
+  protected boolean isValidChar(char ch) {
+    return Character.isLetterOrDigit(ch) || ch=='_' || ch=='(' || ch=='.';
   }
   
   /**
