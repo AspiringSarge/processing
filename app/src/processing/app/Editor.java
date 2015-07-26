@@ -67,7 +67,8 @@ public abstract class Editor extends JFrame implements RunnerListener {
   protected EditorState state;
   protected Mode mode;
 
-  static public final int LEFT_GUTTER = 44;
+  // TODO: Get the proper values for these- changing temporarily
+  static public final int LEFT_GUTTER = 37;
   static public final int RIGHT_GUTTER = 20;
   static public final int GUTTER_MARGIN = 3;
 
@@ -252,6 +253,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     upper.add(header);
 
     textarea = createTextArea();//new PDETextArea(new PdeTextAreaDefaults(mode));
+    // TODO: Add horizontal scrollbar
     scrollbar = new PDEScrollBar(textarea);
     
     textarea.setRightClickPopup(new TextAreaPopup());

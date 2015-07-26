@@ -14,6 +14,8 @@ public class PDEScrollBar extends RTextScrollPane {
     super(pdeTextArea);
     
     this.pdeTextArea = pdeTextArea;
+//    TODO: Figure out how (and whether) to show horizontal scroll bar 
+//    this.getHorizontalScrollBar().setVisible(true);
     pdeTextArea.setScrollbar(this);
   }
 

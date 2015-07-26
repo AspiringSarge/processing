@@ -201,6 +201,7 @@ public class JavaTextArea extends PDETextArea {
     
     this.scrollbar.getGutter().setBookmarkingEnabled(true);
     this.scrollbar.getGutter().setIconRowHeaderInheritsGutterBackground(true);
+    this.scrollbar.setIconRowHeaderEnabled(true);
     this.setCurrentLineHighlightColor(defaults.lineHighlightColor);
     
     // TODO: RSTA- handle padding

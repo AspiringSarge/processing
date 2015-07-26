@@ -257,7 +257,9 @@ public class EditorHeader extends JComponent {
     g.setColor(tabColor[SELECTED]);
     // can't be done with lines, b/c retina leaves tiny hairlines
     g.fillRect(Editor.LEFT_GUTTER, TAB_BOTTOM,
-               editor.getTextArea().getWidth() - Editor.LEFT_GUTTER, 2);
+               editor.getTextArea().getWidth() +
+               editor.getTextArea().getScrollbar().getVerticalScrollBar().getWidth() + 1,
+               2);
 
     // draw the tab for the menu
     g.setColor(tabColor[UNSELECTED]);
