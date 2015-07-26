@@ -11,9 +11,14 @@
 package processing.mode.java.rsta.autocomplete;
 
 import javax.swing.ListCellRenderer;
+import javax.swing.text.Caret;
+import javax.swing.text.JTextComponent;
 
 import org.fife.rsta.ac.AbstractLanguageSupport;
 import org.fife.ui.autocomplete.AutoCompletion;
+import org.fife.ui.autocomplete.Completion;
+import org.fife.ui.autocomplete.CompletionProvider;
+import org.fife.ui.autocomplete.ParameterizedCompletion;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 import processing.mode.java.JavaEditor;
@@ -69,13 +74,25 @@ public class PDELanguageSupport extends AbstractLanguageSupport {
 	public void install(RSyntaxTextArea textArea) {
 
 		PDECompletionProvider provider = getProvider();
-		AutoCompletion ac = createAutoCompletion(provider);
+		PDEAutoCompletion ac = createAutoCompletion(provider);
 		ac.install(textArea);
 		installImpl(textArea, ac);
 
 		textArea.setToolTipSupplier(provider);
 
 	}
+	
+  @Override
+  protected PDEAutoCompletion createAutoCompletion(CompletionProvider p) {
+    PDEAutoCompletion ac = new PDEAutoCompletion(p);
+    ac.setListCellRenderer(getDefaultCompletionCellRenderer());
+    ac.setAutoCompleteEnabled(isAutoCompleteEnabled());
+    ac.setAutoActivationEnabled(isAutoActivationEnabled());
+    ac.setAutoActivationDelay(getAutoActivationDelay());
+    ac.setParameterAssistanceEnabled(isParameterAssistanceEnabled());
+    ac.setShowDescWindow(getShowDescWindow());
+    return ac;
+  }
 
 
 	/**
@@ -86,5 +103,46 @@ public class PDELanguageSupport extends AbstractLanguageSupport {
 		textArea.setToolTipSupplier(null);
 	}
 
+	/**
+	 * Derived from AutoComplete, solely for the purpose of making the process of
+	 * using Autocomplete with overridden methods smoother
+	 * @author Joel Moniz
+	 *
+	 */
+	public class PDEAutoCompletion extends AutoCompletion {
+
+    public PDEAutoCompletion(CompletionProvider provider) {
+      super(provider);
+    }
+    
+    @Override
+    protected void insertCompletion(Completion c,
+                                    boolean typedParamListStartChar) {
+      System.out.println(c.getReplacementText() + "  " + c.getClass().getSimpleName());
+      if (c.getReplacementText().trim().endsWith("(")) {
+        System.out.println("HERE!");
+        JTextComponent textComp = getTextComponent();
+        String alreadyEntered = c.getAlreadyEntered(textComp);
+//        hidePopupWindow();
+        refreshPopupWindow();
+        Caret caret = textComp.getCaret();
+
+        int dot = caret.getDot();
+        int len = alreadyEntered.length();
+        int start = dot - len;
+        String replacement = getReplacementText(c, textComp.getDocument(),
+            start, len);
+
+        caret.setDot(start);
+        caret.moveDot(dot);
+        textComp.replaceSelection(replacement);
+        refreshPopupWindow();
+      }
+      else {
+        super.insertCompletion(c, typedParamListStartChar);
+      }
+    }
+	  
+	}
 
 }

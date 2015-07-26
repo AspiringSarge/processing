@@ -48,7 +48,20 @@ class PDECellRenderer extends CompletionCellRenderer {
 	@Override
 	protected void prepareForOtherCompletion(JList list,
 			Completion c, int index, boolean selected, boolean hasFocus) {
-		super.prepareForOtherCompletion(list, c, index, selected, hasFocus);
+//    System.out.println("Other " + c.getReplacementText());
+	  if (c instanceof PDEBasicCompletionCandidate) {
+	    String descrip = ((PDEBasicCompletionCandidate)c).getShortDescription();
+	    if (descrip.toLowerCase().contains("<html>")) {
+	      setText(descrip);
+	    }
+	    else {
+	      super.prepareForOtherCompletion(list, c, index, selected, hasFocus);
+	    }
+//	    System.out.println("Other here  " + ((PDEBasicCompletionCandidate)c).getShortDescription());
+	  }
+	  else {
+	    super.prepareForOtherCompletion(list, c, index, selected, hasFocus);
+	  }
 		setIcon(getEmptyIcon());
 	}
 
@@ -60,9 +73,16 @@ class PDECellRenderer extends CompletionCellRenderer {
 	protected void prepareForVariableCompletion(JList list,
 			VariableCompletion vc, int index, boolean selected,
 			boolean hasFocus) {
-		super.prepareForVariableCompletion(list, vc, index, selected,
-										hasFocus);
-		setIcon(variableIcon);
+//    System.out.println("Var " + vc.getReplacementText());
+		if (vc instanceof PDEOverloadedFunctionCompletionCandidate) {
+		  setIcon(functionIcon);
+		  setText(((PDEOverloadedFunctionCompletionCandidate)vc).getShortDescription());
+		}
+		else {
+	    super.prepareForVariableCompletion(list, vc, index, selected,
+	                                       hasFocus);
+		  setIcon(variableIcon);
+		}
 	}
 
 
@@ -73,8 +93,16 @@ class PDECellRenderer extends CompletionCellRenderer {
 	protected void prepareForFunctionCompletion(JList list,
 			FunctionCompletion fc, int index, boolean selected,
 			boolean hasFocus) {
-		super.prepareForFunctionCompletion(list, fc, index, selected,
-										hasFocus);
+//    System.out.println("Func " + fc.getReplacementText());
+    // TODO: Instead of using this which has no labeling for names of variables, 
+	  // comment this out and use things like default after giving variables their proper names in the ctor
+	  if (fc instanceof PDEFunctionCompletionCandidate) {
+	    setText(((PDEFunctionCompletionCandidate)fc).getShortDescription());
+	  }
+	  else {
+  		super.prepareForFunctionCompletion(list, fc, index, selected,
+  										hasFocus);
+	  }
 		setIcon(functionIcon);
 	}
 

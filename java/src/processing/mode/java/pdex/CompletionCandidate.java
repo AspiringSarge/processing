@@ -288,4 +288,20 @@ public class CompletionCandidate implements Comparable<CompletionCandidate>{
    }
   }
 
+  public boolean isMethod() {
+    return type == LOCAL_METHOD || type == PREDEF_METHOD;
+  }
+
+  public boolean isField() {
+    return type == LOCAL_FIELD || type == PREDEF_FIELD;
+  }
+  
+  public boolean isPredefined() {
+    return type == PREDEF_CLASS || type == PREDEF_FIELD || type == PREDEF_METHOD;
+  }
+  
+  public boolean isLocal() {
+    return type == LOCAL_CLASS || type == LOCAL_FIELD || type == LOCAL_METHOD || type == LOCAL_VAR;
+  }
+
 }

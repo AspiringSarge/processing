@@ -76,6 +76,10 @@ public class PDECompletionProvider extends LanguageAwareCompletionProvider {
 //    addShorthandCompletions(cp);
     return cp;
   }
+  
+  public List<ParameterizedCompletion> getParameterizedCompletions(JTextComponent tc) {
+    return super.getParameterizedCompletions(tc);
+  }
 
   /**
    * Returns the provider to use when in a comment.
