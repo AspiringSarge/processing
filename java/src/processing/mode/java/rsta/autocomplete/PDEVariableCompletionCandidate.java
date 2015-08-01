@@ -1,50 +1,43 @@
 package processing.mode.java.rsta.autocomplete;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Field;
 
-import javax.swing.text.BadLocationException;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.Position;
-
-import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.CompletionProvider;
-import org.fife.ui.autocomplete.FunctionCompletion;
-import org.fife.ui.autocomplete.ParameterizedCompletion.Parameter;
 import org.fife.ui.autocomplete.VariableCompletion;
 
+import processing.mode.java.pdex.ASTGenerator;
 import processing.mode.java.pdex.CompletionCandidate;
 
-//TODO: Check the overridden funcitons and ensure they're returning 
-//what they're supposed to be
-public class PDEOverloadedFunctionCompletionCandidate extends VariableCompletion {
+// TODO: Check the overridden funcitons and ensure they're returning 
+// what they're supposed to be 
+public class PDEVariableCompletionCandidate extends VariableCompletion {
 
   private String summary;
-//  private List<Parameter> params;
+  //private List<Parameter> params;
   CompletionCandidate cc;
-  private String type;
-
-  public PDEOverloadedFunctionCompletionCandidate(CompletionProvider provider, CompletionCandidate cc) {
-    super(provider, cc.getElementName(), cc.isLocal()?((MethodDeclaration)cc.getWrappedObject()).getReturnType2().toString():((Method)cc.getWrappedObject()).getReturnType().getSimpleName());
-    // TODO: Add in return type variable?
-//    Method m = (Method)cc.getWrappedObject();
-//    ArrayList<Parameter> p = new ArrayList<>();
-//    for (java.lang.reflect.Parameter actPar : m.getParameters()) {
-//      p.add(new Parameter(actPar.getClass().getSimpleName(), actPar.getName()));
-//    }
-//    this.setParams(p);
-    this.cc = cc;    
+  
+  public PDEVariableCompletionCandidate(CompletionProvider provider,
+                                        CompletionCandidate cc) {
+    super(provider, 
+          cc.getElementName(), 
+          (cc.getWrappedObject() instanceof SingleVariableDeclaration)
+          ?((SingleVariableDeclaration)cc.getWrappedObject()).getType().toString()
+          :((cc.getWrappedObject() instanceof VariableDeclarationFragment)
+            ?ASTGenerator.extracTypeInfo2(((VariableDeclarationFragment)cc.getWrappedObject())).toString()
+            :((Field)cc.getWrappedObject()).getType().getSimpleName()));
+    this.cc = cc;
     if (provider instanceof PDECodeCompletionProvider) {
-//    System.out.println(this.getName());
-      this.summary =
-          ((PDECodeCompletionProvider) provider).getDocsMap().getMethodReference(this.getName());
-    } else {
+      this.summary = 
+          ((PDECodeCompletionProvider)provider).getDocsMap().getVariableReference(this.getName());
+    }
+    else {
       this.summary = null;
     }
   }
-  
+
   @Override
   public String getSummary() {
     // Shows docs
@@ -98,20 +91,16 @@ public class PDEOverloadedFunctionCompletionCandidate extends VariableCompletion
     return cc.getLabel();
   }
   
-  @Override
-  public String getShortDescription() {
-    // Shown in popup autocomplete menu
+//  @Override
+//  public String getShortDescription() {
 //    System.out.println("Short: " + cc.getLabel());
-    return cc.getLabel();
-  }
+//    return cc.getLabel();
+//  }
   
   @Override
   public String getName() {
-    return cc.getElementName();//cc.getLabel();
-  }
-  
-  @Override
-  public String getType() {
-    return super.getType();
+    // Shown in popup autocomplete menu
+//    System.out.println("Name: " + cc.getLabel());
+    return cc.getElementName();
   }
 }

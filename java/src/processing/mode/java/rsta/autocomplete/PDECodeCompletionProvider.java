@@ -22,14 +22,17 @@ import org.fife.ui.autocomplete.ParameterizedCompletion.Parameter;
 
 import processing.mode.java.JavaEditor;
 import processing.mode.java.pdex.CompletionCandidate;
+import processing.mode.java.rsta.autocomplete.docs.DocumentationHashMap;
 
 public class PDECodeCompletionProvider extends DefaultCompletionProvider {
 
   JavaEditor editor;
+  DocumentationHashMap docs;
   
   public PDECodeCompletionProvider(JavaEditor editor) {
     this.editor = editor;
     setParameterizedCompletionParams('(', ", ", ')');
+    docs = DocumentationHashMap.getDocumentationHashMap(editor);
   }
   /*
   @Override
@@ -134,6 +137,10 @@ public class PDECodeCompletionProvider extends DefaultCompletionProvider {
 //    f.setSummary(org.fife.rsta.ac.java.Util.docCommentToHtml("/**La di bla\n\n@param comp: Lah*/"));
 //    l.add(f);
     return l;
+  }
+  
+  public DocumentationHashMap getDocsMap() {
+    return docs;
   }
   
   @Override

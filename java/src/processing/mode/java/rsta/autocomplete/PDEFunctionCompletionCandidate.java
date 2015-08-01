@@ -44,8 +44,15 @@ public class PDEFunctionCompletionCandidate extends FunctionCompletion {
       }
     }
     this.setParams(p);
-    this.summary = null;
     this.cc = cc;
+    if (provider instanceof PDECodeCompletionProvider) {
+//      System.out.println(this.getName());
+      this.summary = 
+          ((PDECodeCompletionProvider)provider).getDocsMap().getMethodReference(this.getName());
+    }
+    else {
+      this.summary = null;
+    }
 //    System.out.println(cc.getElementName());
   }
   
