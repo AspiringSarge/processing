@@ -51,6 +51,7 @@ import processing.mode.java.pdex.ErrorMessageSimplifier;
 import processing.mode.java.pdex.JavaTextArea;
 import processing.mode.java.pdex.Problem;
 import processing.mode.java.pdex.XQErrorTable;
+import processing.mode.java.rsta.PDEDebugScrollPane;
 import processing.mode.java.rsta.ProcessingErrorChecker;
 import processing.mode.java.rsta.autocomplete.PDELanguageSupport;
 import processing.mode.java.runner.Runner;
@@ -328,6 +329,12 @@ public class JavaEditor extends Editor {
 //      es.setOpaque(true);
     }
     JPanel temp = new JPanel(new BorderLayout());
+    
+    // done to first hide the original gutter, and then to remove all associated listeners
+    scrollbar.getGutter().unsetTextArea(this.getTextArea());
+    
+    // adding in of new scrollbar handled within the constructor
+    scrollbar = new PDEDebugScrollPane(this);
     temp.add(scrollbar);
     temp.add(es, BorderLayout.LINE_END);
     return temp;

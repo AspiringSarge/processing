@@ -23,6 +23,7 @@ package processing.mode.java.pdex;
 import processing.mode.java.JavaInputHandler;
 import processing.mode.java.JavaMode;
 import processing.mode.java.JavaEditor;
+import processing.mode.java.rsta.PDEGutter;
 import processing.mode.java.tweak.ColorControlBox;
 import processing.mode.java.tweak.Handle;
 
@@ -622,7 +623,10 @@ public class JavaTextArea extends PDETextArea {
    *          the text
    */
   public void setGutterText(int lineIdx, String text) {
-    gutterText.put(lineIdx, text);
+//    System.out.println("Here2");
+    if (editor.getTextArea().getScrollbar().getGutter() instanceof PDEGutter)
+    ((PDEGutter)(editor.getTextArea().getScrollbar().getGutter())).addDebugSymbol(lineIdx, text);
+//    gutterText.put(lineIdx, text);
 //    TODO :RSTA
 //    painter.invalidateLine(lineIdx);
   }
@@ -639,6 +643,8 @@ public class JavaTextArea extends PDETextArea {
    *          the text color
    */
   public void setGutterText(int lineIdx, String text, Color textColor) {
+//    System.out.println("Here1");
+//  TODO :RSTA
     gutterTextColors.put(lineIdx, textColor);
     setGutterText(lineIdx, text);
   }
@@ -651,7 +657,9 @@ public class JavaTextArea extends PDETextArea {
    *          the line index (0-based)
    */
   public void clearGutterText(int lineIdx) {
-    gutterText.remove(lineIdx);
+    if (editor.getTextArea().getScrollbar().getGutter() instanceof PDEGutter)
+      ((PDEGutter)(editor.getTextArea().getScrollbar().getGutter())).removeDebugSymbol(lineIdx);
+//    gutterText.remove(lineIdx);
 //    TODO: RSTA
 //    painter.invalidateLine(lineIdx);
   }
@@ -661,11 +669,13 @@ public class JavaTextArea extends PDETextArea {
    * Clear all gutter text.
    */
   public void clearGutterText() {
-    for (int lineIdx : gutterText.keySet()) {
+//    for (int lineIdx : gutterText.keySet()) {
 //      TODO: RSTA
 //      painter.invalidateLine(lineIdx);
-    }
-    gutterText.clear();
+//    }
+//    gutterText.clear();
+    if (editor.getTextArea().getScrollbar().getGutter() instanceof PDEGutter)
+      ((PDEGutter)(editor.getTextArea().getScrollbar().getGutter())).clearDebugSymbols();
   }
 
 
