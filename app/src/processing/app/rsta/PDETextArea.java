@@ -39,6 +39,26 @@ public class PDETextArea extends RSyntaxTextArea {
   public PDETextArea(TextAreaDefaults defaults) {
     super();
     this.defaults = defaults;
+    setupSyntaxHighlighting();
+  }
+
+  void setupSyntaxHighlighting() {
+    AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
+    atmf.putMapping("text/processing", "processing.app.rsta.PDESyntaxHighlight");
+    Thread t = new Thread(new Runnable() {
+      
+      @Override
+      public void run() {
+        try {
+          Thread.sleep(2000);
+          System.out.println("Starting");
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        setSyntaxEditingStyle("text/processing");
+      }
+    });
+    t.start();
   }
   
   public void setScrollbar(PDEScrollBar scrollbar) {

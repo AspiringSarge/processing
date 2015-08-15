@@ -189,10 +189,11 @@ public class JavaTextArea extends PDETextArea {
   public void setScrollbar(PDEScrollBar scrollbar) {
     super.setScrollbar(scrollbar);
     setGutterUI();
+    setupDebugListener();
   }
 
 
-  public void setGutterUI() {
+  protected void setGutterUI() {
     this.scrollbar.getGutter().setBackground(gutterBgColor);
     this.scrollbar.getGutter().setLineNumberColor(gutterTextColor);
     this.scrollbar.getGutter().setLineNumberFont(gutterTextFont);
