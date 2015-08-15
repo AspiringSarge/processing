@@ -1,5 +1,6 @@
 package processing.app.rsta;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -18,17 +19,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
+import javax.swing.text.StyleContext;
 
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.Style;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.TokenTypes;
+import org.fife.ui.rtextarea.RTextAreaBase;
 
 import processing.app.Preferences;
 import processing.app.syntax.HtmlSelection;
 import processing.app.syntax.PdeTextAreaDefaults;
 import processing.app.syntax.SyntaxDocument;
+import processing.app.syntax.SyntaxStyle;
 import processing.app.syntax.TextAreaDefaults;
+import processing.app.syntax.Token;
 import processing.app.syntax.TokenMarker;
 
 public class PDETextArea extends RSyntaxTextArea {
@@ -37,7 +44,7 @@ public class PDETextArea extends RSyntaxTextArea {
   protected TextAreaDefaults defaults;
   
   public PDETextArea(TextAreaDefaults defaults) {
-    super();
+    super(/*defaults.rows, defaults.cols*/);
     this.defaults = defaults;
     setupSyntaxHighlighting();
   }
@@ -60,7 +67,128 @@ public class PDETextArea extends RSyntaxTextArea {
     });
     t.start();
   }
+
+
+  private static Font baseFont;
+  private static Font boldFont;
+  private static Font italicFont;
+  public void setupHighlightingStyle(Font baseFont) {
+
+    // Colors used by tokens.
+    Color comment     = new Color(0,128,0);
+    Color docComment    = new Color(164,0,0);
+    Color markupComment   = new Color(0, 96, 0);
+    Color keyword     = Color.RED;
+    Color dataType      = new Color(0,128,128);
+    Color function      = new Color(173,128,0);
+    Color preprocessor    = new Color(128,128,128);
+    Color operator      = new Color(128, 64, 64);
+    Color regex       = new Color(0,128,164);
+    Color variable      = new Color(255,153,0);
+    Color literalNumber   = new Color(100,0,200);
+    Color literalString   = new Color(220,0,156);
+    Color error     = new Color(148,148,0);
+
+    // (Possible) special font styles for keywords and comments.
+    if (baseFont==null) {
+      PDETextArea.baseFont = RTextAreaBase.getDefaultFont();
+    }
+    Font commentFont = PDETextArea.baseFont;
+    Font keywordFont = PDETextArea.baseFont;
+    // WORKAROUND for Sun JRE bug 6282887 (Asian font bug in 1.4/1.5)
+    // That bug seems to be hidden now, see 6289072 instead.
+    StyleContext sc = StyleContext.getDefaultStyleContext();
+    PDETextArea.boldFont = sc.getFont(baseFont.getFamily(), Font.BOLD,
+        baseFont.getSize());
+    PDETextArea.italicFont = sc.getFont(baseFont.getFamily(), Font.ITALIC,
+        baseFont.getSize());
+//    commentFont = PDETextArea.italicFont;
+//    keywordFont = PDETextArea.boldFont;
+    Style[] styles = new Style[TokenTypes.DEFAULT_NUM_TOKEN_TYPES];
+    styles[TokenTypes.COMMENT_EOL] = syntaxStyleToStyle(defaults.styles[Token.COMMENT1]);
+    styles[TokenTypes.COMMENT_MULTILINE] = syntaxStyleToStyle(defaults.styles[Token.COMMENT2]);
+    styles[TokenTypes.COMMENT_DOCUMENTATION] = syntaxStyleToStyle(defaults.styles[Token.COMMENT2]);
+    styles[TokenTypes.RESERVED_WORD] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD1]);
+    styles[TokenTypes.RESERVED_WORD_2] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD2]);
+    styles[TokenTypes.RESERVED_WORD_3] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD3]);
+    styles[TokenTypes.RESERVED_WORD_4] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD4]);
+    styles[TokenTypes.DATA_TYPE] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD5]);
+    styles[TokenTypes.RESERVED_WORD_5] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD6]);
+    styles[TokenTypes.FUNCTION1] = syntaxStyleToStyle(defaults.styles[Token.FUNCTION1]);
+    styles[TokenTypes.FUNCTION2] = syntaxStyleToStyle(defaults.styles[Token.FUNCTION2]);
+    styles[TokenTypes.FUNCTION3] = syntaxStyleToStyle(defaults.styles[Token.FUNCTION3]);
+    styles[TokenTypes.FUNCTION4] = syntaxStyleToStyle(defaults.styles[Token.FUNCTION4]);
+    styles[TokenTypes.LITERAL_CHAR] = syntaxStyleToStyle(defaults.styles[Token.LITERAL1]);
+    styles[TokenTypes.LITERAL_BACKQUOTE] = syntaxStyleToStyle(defaults.styles[Token.LITERAL1]);
+    styles[TokenTypes.LITERAL_STRING_DOUBLE_QUOTE] = syntaxStyleToStyle(defaults.styles[Token.LITERAL1]);
+    styles[TokenTypes.CONSTANTS] = syntaxStyleToStyle(defaults.styles[Token.LITERAL2]);
+    styles[TokenTypes.OPERATOR] = syntaxStyleToStyle(defaults.styles[Token.OPERATOR]);
+    styles[TokenTypes.LABEL] = syntaxStyleToStyle(defaults.styles[Token.LABEL]);
+
+    // TODO: When handling boolean, ensure that it is removed from keywords1 list- it's now included
+    // as both LITERAL_BOOLEAN and keyword1
+    styles[TokenTypes.LITERAL_BOOLEAN] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD1]);
+
+    // TODO: Definitely add in more options for each of these later on in preferences file
+    styles[TokenTypes.LITERAL_NUMBER_DECIMAL_INT] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD2]);
+    styles[TokenTypes.LITERAL_NUMBER_FLOAT] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD2]);
+    styles[TokenTypes.LITERAL_NUMBER_HEXADECIMAL] = syntaxStyleToStyle(defaults.styles[Token.KEYWORD2]);
+    styles[TokenTypes.COMMENT_KEYWORD] = syntaxStyleToStyle(defaults.styles[Token.COMMENT1]);
+    SyntaxStyle defaultStyle = new SyntaxStyle(defaults.fgcolor, false);
+    styles[TokenTypes.SEPARATOR] = syntaxStyleToStyle(defaultStyle);
+
+    // TODO: Possibly add in more options for each of these later on
+    styles[TokenTypes.FUNCTION] = syntaxStyleToStyle(defaultStyle);
+    styles[TokenTypes.VARIABLE] = syntaxStyleToStyle(defaultStyle);
+    styles[TokenTypes.IDENTIFIER] = syntaxStyleToStyle(defaultStyle);
+    styles[TokenTypes.WHITESPACE] = new Style();
+
+    // TODO: Just leaving this as default for now- this probably has to be removed later
+    styles[TokenTypes.COMMENT_MARKUP] = syntaxStyleToStyle(defaults.styles[Token.COMMENT1]);
+    styles[TokenTypes.REGEX] = new Style(regex);
+    styles[TokenTypes.ANNOTATION] = new Style(Color.gray);
+    styles[TokenTypes.PREPROCESSOR] = new Style(preprocessor);
+    styles[TokenTypes.MARKUP_TAG_DELIMITER] = new Style(Color.RED);
+    styles[TokenTypes.MARKUP_TAG_NAME] = new Style(Color.BLUE);
+    styles[TokenTypes.MARKUP_TAG_ATTRIBUTE] = new Style(new Color(63, 127, 127));
+    styles[TokenTypes.MARKUP_TAG_ATTRIBUTE_VALUE] = new Style(literalString);
+    styles[TokenTypes.MARKUP_COMMENT] = new Style(markupComment, null,
+                                                  commentFont);
+    styles[TokenTypes.MARKUP_DTD] = new Style(function);
+    styles[TokenTypes.MARKUP_PROCESSING_INSTRUCTION] = new Style(preprocessor);
+    styles[TokenTypes.MARKUP_CDATA] = new Style(new Color(0xcc6600));
+    styles[TokenTypes.MARKUP_CDATA_DELIMITER] = new Style(new Color(0x008080));
+    styles[TokenTypes.MARKUP_ENTITY_REFERENCE] = new Style(dataType);
+    styles[TokenTypes.ERROR_IDENTIFIER] = new Style(error);
+    styles[TokenTypes.ERROR_NUMBER_FORMAT] = new Style(error);
+    styles[TokenTypes.ERROR_STRING_DOUBLE] = new Style(error);
+    styles[TokenTypes.ERROR_CHAR] = new Style(error);
+
+    // Issue #34: If an application modifies TokenTypes to add new built-in
+    // token types, we'll get NPEs if not all styles are initialized.
+    for (int i=0; i<styles.length; i++) {
+      if (styles[i]==null) {
+        styles[i] = new Style();
+      }
+    }
+    getSyntaxScheme().setStyles(styles);
+
+    setTabsEmulated(Preferences.getBoolean("editor.tabs.expand"));
+    setTabSize(Preferences.getInteger("editor.tabs.size")+4);
+    System.out.println(getTabSize());
+  }
+
+
+  public static Style syntaxStyleToStyle(SyntaxStyle s) {
+    if (s.isBold()) {
+      return new Style(s.getColor(), null, boldFont);
+    }
+    else {
+      return new Style(s.getColor(), null, baseFont);
+    }
+  }
   
+
   public void setScrollbar(PDEScrollBar scrollbar) {
     this.scrollbar = scrollbar;
   }
@@ -498,6 +626,9 @@ public class PDETextArea extends RSyntaxTextArea {
 
     // TODO: This is done automatically, right?
 //    textArea.recalculateVisibleLines();
+    
+    setupSyntaxHighlighting();
+    setupHighlightingStyle(plainFont);
   }
   
   // TODO: Look at commented out lines
