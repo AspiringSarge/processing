@@ -174,7 +174,7 @@ public class PDETextArea extends RSyntaxTextArea {
     getSyntaxScheme().setStyles(styles);
 
     setTabsEmulated(Preferences.getBoolean("editor.tabs.expand"));
-    setTabSize(Preferences.getInteger("editor.tabs.size")+4);
+    setTabSize(Preferences.getInteger("editor.tabs.size"));
     System.out.println(getTabSize());
   }
 

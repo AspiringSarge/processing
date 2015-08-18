@@ -29,6 +29,8 @@ import processing.mode.java.tweak.Handle;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +40,14 @@ import javafx.scene.layout.Border;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
+
+import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser;
+import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
+import org.fife.ui.rtextarea.Gutter;
+import org.fife.ui.rtextarea.LineNumberList;
+import org.fife.ui.rtextarea.RTextArea;
 
 import processing.app.Base;
 import processing.app.Editor;
@@ -122,7 +132,7 @@ public class JavaTextArea extends PDETextArea {
 //    ComponentListener[] componentListeners = painter.getComponentListeners();
     
     // TODO: RSTA
-    //    mouseListeners = painter.getMouseListeners();
+        mouseListeners = this.getMouseListeners();
     
 //    MouseMotionListener[] mouseMotionListeners = painter.getMouseMotionListeners();
 //
@@ -139,14 +149,12 @@ public class JavaTextArea extends PDETextArea {
 //    for (MouseMotionListener mml : mouseMotionListeners) {
 //      painter.addMouseMotionListener(mml);
 //    }
-    /* TODO: RSTA
     // use a custom mouse handler instead of directly using mouseListeners
-    MouseHandler mouseHandler = new MouseHandler();
-    painter.addMouseListener(mouseHandler);
-    painter.addMouseMotionListener(mouseHandler);
+//    MouseHandler mouseHandler = new MouseHandler();
+//    this.addMouseListener(mouseHandler);
+//    this.addMouseMotionListener(mouseHandler);
     //addCompletionPopupListner();
-    add(CENTER, painter);
-    */
+//    add(CENTER, painter);
 
     loadThemeSettings();
     
@@ -189,7 +197,6 @@ public class JavaTextArea extends PDETextArea {
   public void setScrollbar(PDEScrollBar scrollbar) {
     super.setScrollbar(scrollbar);
     setGutterUI();
-    setupDebugListener();
   }
 
 
@@ -397,8 +404,7 @@ public class JavaTextArea extends PDETextArea {
    */
   private String fetchPhrase(MouseEvent evt) {
     Base.log("--handle Mouse Right Click--");
-    return "";
-    /*
+//    return "";
     int off = xyToOffset(evt.getX(), evt.getY());
     if (off < 0)
       return null;
@@ -450,13 +456,14 @@ public class JavaTextArea extends PDETextArea {
           break;
         }
       }
+      
       if (Character.isDigit(word.charAt(0))) {
         return null;
       }
       Base.log("Mouse click, word: " + word.trim());
       editor.getErrorChecker().getASTGenerator().setLastClickedWord(line, word, xLS);
       return word.trim();
-    }*/
+    }
   }
 
 
@@ -788,8 +795,18 @@ public class JavaTextArea extends PDETextArea {
 //  @Override
   public int xToOffset(int line, int x) {
 //    return super.xToOffset(line, x - Editor.LEFT_GUTTER);
-    return 0;
+    return viewToModel(new Point(x, 0));
+//    
+//    return 0;
   }
+
+
+  public int xyToOffset(int x, int y) {
+//  return super.xToOffset(line, x - Editor.LEFT_GUTTER);
+  return viewToModel(new Point(x, y));
+//  
+//  return 0;
+}
 
 
   /**
@@ -797,6 +814,7 @@ public class JavaTextArea extends PDETextArea {
    * toggle breakpoints, sets default cursor (instead of text cursor) in the
    * gutter area.
    */
+  // TODO: RSTA- this is no longer used- safely remove?
   protected class MouseHandler implements MouseListener, MouseMotionListener {
     protected int lastX; // previous horizontal positon of the mouse cursor
 
@@ -873,6 +891,8 @@ public class JavaTextArea extends PDETextArea {
     @Override
     public void mouseMoved(MouseEvent me) {
       // No need to forward since the standard MouseMotionListeners are called anyway
+      /*
+      RSTA NOTE: This no longer needs to be done- taken care of by RSTA 
       if (me.getX() < Editor.LEFT_GUTTER) {
         if (lastX >= Editor.LEFT_GUTTER) {
 //          TODO: RSTA
@@ -885,6 +905,7 @@ public class JavaTextArea extends PDETextArea {
         }
       }
       lastX = me.getX();
+      */
     }
   }
 
@@ -1045,5 +1066,35 @@ public class JavaTextArea extends PDETextArea {
   public void updateInterface(List<List<Handle>> handles,
                               List<List<ColorControlBox>> colorBoxes) {
     getCustomPainter().updateInterface(handles, colorBoxes);
+  }
+
+  @Override
+  protected RTAMouseListener createMouseListener() {
+    return new PDETextAreaMutableCaretEvent(this);
+  };
+  
+  // RSTA TODO: Forward to other listeners like MouseHandler does?
+  protected class PDETextAreaMutableCaretEvent extends RTextAreaMutableCaretEvent {
+
+    protected PDETextAreaMutableCaretEvent(RTextArea arg0) {
+      super(arg0);
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      if (e.isPopupTrigger() && !editor.hasJavaTabs()) {
+          fetchPhrase(e);
+      }
+      super.mousePressed(e);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+      if (e.isPopupTrigger()) {
+        fetchPhrase(e);
+      }
+      super.mouseReleased(e);
+    }
+    
   }
 }
