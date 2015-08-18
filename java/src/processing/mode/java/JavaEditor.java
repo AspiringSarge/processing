@@ -325,8 +325,8 @@ public class JavaEditor extends Editor {
     if (es == null) {
       es = new ErrorStrip(textarea);
 //      TODO:
-//      es.setBackground(mode.getColor("gutter.bgcolor"));
-//      es.setOpaque(true);
+      es.setBackground(mode.getColor("gutter.bgcolor"));
+      es.setOpaque(true);
     }
     JPanel temp = new JPanel(new BorderLayout());
     

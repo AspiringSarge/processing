@@ -15,7 +15,7 @@ public class PDEDebugScrollPane extends PDEScrollBar {
   
   public PDEDebugScrollPane(PDETextArea pdeTextArea) {
     super(pdeTextArea);
-    this.gutter.setLineNumberColor(Color.BLUE);
+//    this.gutter.setLineNumberColor(Color.BLUE);
   }
   
   public PDEDebugScrollPane(JavaEditor javaeditor) {
@@ -23,7 +23,8 @@ public class PDEDebugScrollPane extends PDEScrollBar {
     gutter = new PDEGutter(javaeditor);
     
     // TODO: Workaround, discovered after much effort: set the new gutter into
-    // the scrollpane manually to get it to work 
+    // the scrollpane manually to get it to work- done to enable debug symbols
+    // to be toggled on click
     this.setRowHeaderView(gutter);
     
     // sets the text area's scrollpane instance as this object. Also handles

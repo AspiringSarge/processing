@@ -1996,7 +1996,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
     textarea.setDocument(document,
                          code.getSelectionStart(), code.getSelectionStop(),
                          code.getScrollPosition());
-
+    textarea.setSyntaxEditingStyle("text/processing");
 //    textarea.requestFocus();  // get the caret blinking
     textarea.requestFocusInWindow();  // required for caret blinking
 

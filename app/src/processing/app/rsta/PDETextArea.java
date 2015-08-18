@@ -46,26 +46,27 @@ public class PDETextArea extends RSyntaxTextArea {
   public PDETextArea(TextAreaDefaults defaults) {
     super(/*defaults.rows, defaults.cols*/);
     this.defaults = defaults;
-    setupSyntaxHighlighting();
+    // Syntax highlighting setup in Editor's setCode() method
+//    setupSyntaxHighlighting();
   }
 
   void setupSyntaxHighlighting() {
     AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory)TokenMakerFactory.getDefaultInstance();
     atmf.putMapping("text/processing", "processing.app.rsta.PDESyntaxHighlight");
-    Thread t = new Thread(new Runnable() {
-      
-      @Override
-      public void run() {
-        try {
-          Thread.sleep(2000);
-          System.out.println("Starting");
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
+//    Thread t = new Thread(new Runnable() {
+//      
+//      @Override
+//      public void run() {
+//        try {
+//          Thread.sleep(2000);
+//          System.out.println("Starting");
+//        } catch (InterruptedException e) {
+//          e.printStackTrace();
+//        }
         setSyntaxEditingStyle("text/processing");
-      }
-    });
-    t.start();
+//      }
+//    });
+//    t.start();
   }
 
 
@@ -217,6 +218,9 @@ public class PDETextArea extends RSyntaxTextArea {
   public final String getLineText(int lineIndex) {
     int start = getLineStartOffset(lineIndex);
     int len = getLineStopOffset(lineIndex) - start - 1;
+    if (len < 0) {
+      return "";
+    }
     String str = getText(start, len);
     return str;
   }
@@ -348,6 +352,8 @@ public class PDETextArea extends RSyntaxTextArea {
     String str;
     offset = getLineStartOffset(line);
     length = getLineLength(line);
+    if (length == -1)
+      return offset;
     str = getText(offset, length);
 
     for(int i = 0; i < str.length(); i++) {

@@ -417,7 +417,7 @@ public class JavaTextArea extends PDETextArea {
     else if (s.length() == 0)
       return null;
     else {
-      int x = xToOffset(line, evt.getX()), x2 = x + 1, x1 = x - 1;
+      int x = xToOffset(line, evt.getX(), evt.getY()), x2 = x + 1, x1 = x - 1;
       int xLS = off - getLineStartNonWhiteSpaceOffset(line);
       Base.log("x=" + x);
       if (x < 0 || x >= s.length())
@@ -793,9 +793,9 @@ public class JavaTextArea extends PDETextArea {
    * @return he character offset (0 is the first character on a line)
    */
 //  @Override
-  public int xToOffset(int line, int x) {
+  public int xToOffset(int line, int x, int y) {
 //    return super.xToOffset(line, x - Editor.LEFT_GUTTER);
-    return viewToModel(new Point(x, 0));
+    return xyToOffset(x, y)-getLineStartOffset(line);
 //    
 //    return 0;
   }
