@@ -95,6 +95,9 @@ public class JavaTextArea extends PDETextArea {
   protected Font gutterTextFont;
   protected Color gutterTextColor;
   protected Color gutterLineHighlightColor;
+  
+  protected Color gutterFolderColor;
+  protected boolean isFoldEnabled;
 
   /// the text marker for highlighting breakpoints in the gutter
   public String breakpointMarker = "<>";
@@ -190,6 +193,9 @@ public class JavaTextArea extends PDETextArea {
     errorMarkerColor = mode.getColor("editor.errormarkercolor"); //, errorMarkerColor);
     warningMarkerColor = mode.getColor("editor.warningmarkercolor"); //, warningMarkerColor);
     
+    gutterFolderColor = mode.getColor("editor.gutter.fold.color");
+    isFoldEnabled = mode.getBoolean("editor.gutter.fold");
+    
     this.defaults = new PdeTextAreaDefaults(mode);
   }
 
@@ -197,6 +203,10 @@ public class JavaTextArea extends PDETextArea {
   public void setScrollbar(PDEScrollBar scrollbar) {
     super.setScrollbar(scrollbar);
     setGutterUI();
+//    TODO: Adding in provision for code folding, but not actaully using it
+//    until I can setup the margin properly- i.e., replace Editor.LEFT_GUTTER
+//    with (Editor.LEFT_GUTTER + JavaEditor.CODE_FOLD_GUTTER) whereever appropriate
+//    setupFolding();
   }
 
 
@@ -208,15 +218,39 @@ public class JavaTextArea extends PDETextArea {
     // TODO: RSTA- this is wrong: figure out how to set background of current line
 //    this.scrollbar.getGutter().setActiveLineRangeColor(gutterLineHighlightColor);
     
-    this.scrollbar.getGutter().setBookmarkingEnabled(true);
-    this.scrollbar.getGutter().setIconRowHeaderInheritsGutterBackground(true);
-    this.scrollbar.setIconRowHeaderEnabled(true);
+    // TODO: Probably call this from outside, or call method that sets up folder
+    // from within this method for consistency
+    setupBookmarksAndIcons();
     this.setCurrentLineHighlightColor(defaults.lineHighlightColor);
     
     // TODO: RSTA- handle padding
     this.scrollbar.setBorder(new EmptyBorder(0, 0, 0, 0));
     this.setBorder(new EmptyBorder(0, 0, 0, 0));
     this.scrollbar.getGutter().setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+  }
+
+
+  protected void setupFolding() {
+    /* 
+     * do this whole block only if code folding is enabled, and not just
+     * via setCodeFoldingEnabled(), since otherwise, it leaves a weird border on the
+     * right
+     */
+    if (isFoldEnabled) {
+      this.scrollbar.getGutter().setFoldIndicatorForeground(gutterFolderColor);
+      this.scrollbar.getGutter().setFoldIndicatorEnabled(true);
+      this.scrollbar.getGutter().setFoldBackground(gutterBgColor);
+      FoldParserManager.get().addFoldParserMapping("text/processing", new CurlyFoldParser());
+      setCodeFoldingEnabled(true);
+    }
+  }
+
+
+  // RSTA TODO:
+  protected void setupBookmarksAndIcons() {
+    this.scrollbar.getGutter().setBookmarkingEnabled(true);
+    this.scrollbar.getGutter().setIconRowHeaderInheritsGutterBackground(true);
+    this.scrollbar.setIconRowHeaderEnabled(true);
   }
 
 

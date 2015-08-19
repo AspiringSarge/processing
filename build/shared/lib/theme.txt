@@ -119,3 +119,7 @@ editor.gutter.text.font = processing.mono,plain,11
 #editor.gutter.text.color = #587478
 editor.gutter.text.color = #bbd6d5
 editor.gutter.linehighlight.color=#587478
+
+# code folder
+editor.gutter.fold = true
+editor.gutter.fold.color = #657d87
