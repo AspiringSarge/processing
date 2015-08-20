@@ -408,9 +408,10 @@ public class PDETextArea extends RSyntaxTextArea {
     // Read the code line by line
     for (int i = startLine; i <= stopLine; i++) {
       emitAsHTML(cf, i);
+      cf.append("\n");
     }
 
-    cf.append("\n</pre></body></html>");
+    cf.append("</pre></body></html>");
 
     HtmlSelection formatted = new HtmlSelection(cf.toString());
 
@@ -443,17 +444,20 @@ public class PDETextArea extends RSyntaxTextArea {
     return getDocument().getDefaultRootElement().getElementIndex(offset);
   }
 
-  // TODO: This...
   private void emitAsHTML(StringBuilder cf, int line) {
     Segment segment = new Segment();
     getLineText(line, segment);
 
-    char[] segmentArray = segment.array;
-    int limit = segment.getEndIndex();
-    int segmentOffset = segment.offset;
-    int segmentCount = segment.count;
-    // TODO: TokenMarker tokenMarker = getTokenMarker();
-    TokenMarker tokenMarker = null;
+    org.fife.ui.rsyntaxtextarea.Token tok = ((RSyntaxDocument)getDocument()).getTokenListForLine(line);
+    
+    while (tok != null && tok.getType() != TokenTypes.NULL) {
+      System.out.println(tok.getHTMLRepresentation(this));
+      cf.append(tok.getHTMLRepresentation(this));
+      tok = tok.getNextToken();
+    }
+    // RSTA TODO: Check whether one should actually check if syntax highlighting is enabled
+    // RSTA TODO: Make custom HTML parser instead of RSTA's default one?
+    /*
     // If syntax coloring is disabled, do simple translation
     if (tokenMarker == null) {
       for (int j = 0; j < segmentCount; j++) {
@@ -461,11 +465,11 @@ public class PDETextArea extends RSyntaxTextArea {
         //cf = cf.append(c);
         appendAsHTML(cf, c);
       }
-    }/* TODO: 
+    }
     else {
       // If syntax coloring is enabled, we have to do this
       // because tokens can vary in width
-      Token tokens;
+/*      Token tokens;
       if ((painter.getCurrentLineIndex() == line) &&
           (painter.getCurrentLineTokens() != null)) {
         tokens = painter.getCurrentLineTokens();
@@ -519,7 +523,7 @@ public class PDETextArea extends RSyntaxTextArea {
         offset += length;
         tokens = tokens.next;
       }
-    } */
+    }*/
   }
 
   /**
