@@ -155,7 +155,6 @@ public class JavaTextAreaPainter extends TextAreaPainter
 
   void handleCtrlClick(MouseEvent evt) {
     /*
-    A HUGE TODO:
     Base.log("--handleCtrlClick--");
     int off = textArea.xyToOffset(evt.getX(), evt.getY());
     if (off < 0)

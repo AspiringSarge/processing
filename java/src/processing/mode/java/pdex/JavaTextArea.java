@@ -1007,6 +1007,68 @@ public class JavaTextArea extends PDETextArea {
   }
 
 
+  void handleCtrlClick(MouseEvent evt) {
+    Base.log("--handleCtrlClick--");
+    int off = xyToOffset(evt.getX(), evt.getY());
+    if (off < 0)
+      return;
+    int line = getLineOfOffset(off);
+    if (line < 0)
+      return;
+    String s = getLineText(line);
+    if (s == null)
+      return;
+    else if (s.length() == 0)
+      return;
+    else {
+      int x = xToOffset(line, evt.getX(), evt.getY()), x2 = x + 1, x1 = x - 1;
+      Base.log("x="+x);
+      int xLS = off - getLineStartNonWhiteSpaceOffset(line);
+      if (x < 0 || x >= s.length())
+        return;
+      String word = s.charAt(x) + "";
+      if (s.charAt(x) == ' ')
+        return;
+      if (!(Character.isLetterOrDigit(s.charAt(x)) || s.charAt(x) == '_' || s.charAt(x) == '$'))
+        return;
+      int i = 0;
+      while (true) {
+        i++;
+        if (x1 >= 0 && x1 < s.length()) {
+          if (Character.isLetter(s.charAt(x1)) || s.charAt(x1) == '_') {
+            word = s.charAt(x1--) + word;
+            xLS--;
+          } else
+            x1 = -1;
+        } else
+          x1 = -1;
+
+        if (x2 >= 0 && x2 < s.length()) {
+          if (Character.isLetterOrDigit(s.charAt(x2)) || s.charAt(x2) == '_'
+              || s.charAt(x2) == '$')
+            word = word + s.charAt(x2++);
+          else
+            x2 = -1;
+        } else
+          x2 = -1;
+
+        if (x1 < 0 && x2 < 0)
+          break;
+        if (i > 200) {
+          // time out!
+          // System.err.println("Whoopsy! :P");
+          break;
+        }
+      }
+      if (Character.isDigit(word.charAt(0)))
+        return;
+
+      Base.log(editor.getErrorChecker().mainClassOffset + line + "|" + line + "| offset " + xLS + word + " <= \n");
+      editor.getErrorChecker().getASTGenerator().scrollToDeclaration(line, word, xLS);
+    }
+  }
+
+
   // TweakMode code
 
   // save input listeners to stop/start text edit
@@ -1128,6 +1190,19 @@ public class JavaTextArea extends PDETextArea {
         fetchPhrase(e);
       }
       super.mouseReleased(e);
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+      if (!editor.hasJavaTabs()) { // Ctrl + Click disabled for java tabs
+        if (e.getButton() == MouseEvent.BUTTON1) {
+          if ((e.isControlDown() && !Base.isMacOS()) || e.isMetaDown()) {
+            handleCtrlClick(e);
+          }
+        }
+      }
+      
+      super.mouseClicked(e);
     }
     
   }
