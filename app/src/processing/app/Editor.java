@@ -1533,6 +1533,13 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+      textarea.undoLastAction();
+      updateUndoState();
+      redoAction.updateRedoState();
+      if (sketch != null) {
+        sketch.setModified(!getText().equals(sketch.getCurrentCode().getSavedProgram()));
+      }
+      /*
       stopCompoundEdit();
 
       try {
@@ -1549,15 +1556,11 @@ public abstract class Editor extends JFrame implements RunnerListener {
         //System.out.println("Unable to undo: " + ex);
         //ex.printStackTrace();
       }
-      updateUndoState();
-      redoAction.updateRedoState();
-      if (sketch != null) {
-        sketch.setModified(!getText().equals(sketch.getCurrentCode().getSavedProgram()));
-      }
+      */
     }
 
     protected void updateUndoState() {
-      if (undo.canUndo() || compoundEdit != null && compoundEdit.isInProgress()) {
+      if (textarea.canUndo() || compoundEdit != null && compoundEdit.isInProgress()) {
         this.setEnabled(true);
         undoItem.setEnabled(true);
         String newUndoPresentationName = Language.text("menu.edit.undo");
@@ -1591,6 +1594,13 @@ public abstract class Editor extends JFrame implements RunnerListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+      textarea.redoLastAction();
+      updateRedoState();
+      undoAction.updateUndoState();
+      if (sketch != null) {
+        sketch.setModified(!getText().equals(sketch.getCurrentCode().getSavedProgram()));
+      }
+      /*
       stopCompoundEdit();
 
       try {
@@ -1605,15 +1615,11 @@ public abstract class Editor extends JFrame implements RunnerListener {
         textarea.setCaretPosition(caret);
       } catch (Exception ignore) {
       }
-      updateRedoState();
-      undoAction.updateUndoState();
-      if (sketch != null) {
-        sketch.setModified(!getText().equals(sketch.getCurrentCode().getSavedProgram()));
-      }
+      */
     }
 
     protected void updateRedoState() {
-      if (undo.canRedo()) {
+      if (textarea.canRedo()) {
         redoItem.setEnabled(true);
         String newRedoPresentationName = Language.text("menu.edit.redo");
         if (undo.getRedoPresentationName().equals("Redo addition")) {

@@ -5,18 +5,17 @@ import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.KeyEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 
 import javax.swing.JPopupMenu;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
+import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
 import javax.swing.text.StyleContext;
@@ -27,16 +26,15 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Style;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.TokenTypes;
+import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.RTextAreaBase;
+import org.fife.ui.rtextarea.RTextAreaUI;
 
 import processing.app.Preferences;
 import processing.app.syntax.HtmlSelection;
-import processing.app.syntax.PdeTextAreaDefaults;
-import processing.app.syntax.SyntaxDocument;
 import processing.app.syntax.SyntaxStyle;
 import processing.app.syntax.TextAreaDefaults;
 import processing.app.syntax.Token;
-import processing.app.syntax.TokenMarker;
 
 public class PDETextArea extends RSyntaxTextArea {
   private int horizontalOffset;
@@ -46,6 +44,10 @@ public class PDETextArea extends RSyntaxTextArea {
   public PDETextArea(TextAreaDefaults defaults) {
     super(/*defaults.rows, defaults.cols*/);
     this.defaults = defaults;
+    
+    int defaultModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    RTextArea.getAction(UNDO_ACTION).setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, defaultModifier));
+    
     // Syntax highlighting setup in Editor's setCode() method
 //    setupSyntaxHighlighting();
   }
@@ -671,5 +673,20 @@ public class PDETextArea extends RSyntaxTextArea {
         }
       }
     };
+  }
+  
+  @Override
+  public void undoLastAction() {
+    super.undoLastAction();
+  }
+  
+  @Override
+  public void redoLastAction() {
+    super.redoLastAction();
+  }
+  
+  @Override
+  protected RTextAreaUI createRTextAreaUI() {
+    return new PDETextAreaUI(this);
   }
 }
