@@ -68,7 +68,7 @@ public abstract class Editor extends JFrame implements RunnerListener {
   protected Mode mode;
 
   // TODO: Get the proper values for these- changing temporarily
-  static public final int LEFT_GUTTER = 37;
+  static public final int LEFT_GUTTER = 37+8;
   static public final int RIGHT_GUTTER = 20;
   static public final int GUTTER_MARGIN = 3;
 

@@ -206,7 +206,7 @@ public class JavaTextArea extends PDETextArea {
 //    TODO: Adding in provision for code folding, but not actaully using it
 //    until I can setup the margin properly- i.e., replace Editor.LEFT_GUTTER
 //    with (Editor.LEFT_GUTTER + JavaEditor.CODE_FOLD_GUTTER) whereever appropriate
-//    setupFolding();
+    setupFolding();
   }
 
 

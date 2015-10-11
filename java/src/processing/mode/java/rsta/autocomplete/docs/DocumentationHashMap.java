@@ -108,8 +108,11 @@ public class DocumentationHashMap {
 //      System.out.println("Done.");
       return null;
     }
-    p5DocsToRSTADocs.append(doc.substring(doc.indexOf("<table"), 
-                                          doc.lastIndexOf("</table>")+8));
+    
+    String table = doc.substring(doc.indexOf("<table"), 
+                                 doc.lastIndexOf("</table>")+8);
+    String imageTable = table.replaceAll("<img src=.*?>", "");
+    p5DocsToRSTADocs.append(imageTable);
     p5DocsToRSTADocs.append("</html>");
     return p5DocsToRSTADocs.toString();
   }
